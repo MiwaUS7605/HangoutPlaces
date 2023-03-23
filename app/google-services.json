@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "706988244007",
+    "firebase_url": "https://locationsharing-b5281-default-rtdb.firebaseio.com",
+    "project_id": "locationsharing-b5281",
+    "storage_bucket": "locationsharing-b5281.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:706988244007:android:580ec67b54ef884d49e202",
+        "android_client_info": {
+          "package_name": "com.groupb.locationsharing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "706988244007-76ab5fjt29crsa5k75h14mfovg4u3mhk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAz4_ENH0S1R2yFHugTSc_v9A17jbf7rkw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "706988244007-76ab5fjt29crsa5k75h14mfovg4u3mhk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
