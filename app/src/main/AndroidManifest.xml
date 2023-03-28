@@ -14,14 +14,14 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false"
-            android:parentActivityName=".StartActivity"/>
+            android:parentActivityName=".StartActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
-            android:parentActivityName=".StartActivity"/>
+            android:parentActivityName=".StartActivity" />
         <activity
             android:name=".StartActivity"
             android:exported="true">
