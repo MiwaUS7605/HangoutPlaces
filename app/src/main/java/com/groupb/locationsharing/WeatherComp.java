@@ -1,13 +1,24 @@
 package com.groupb.locationsharing;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +31,7 @@ public class WeatherComp extends AppCompatActivity {
 
     private TextView weatherStatus;
     private Button getWeatherButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +40,12 @@ public class WeatherComp extends AppCompatActivity {
         // Allow network operations to be performed on the main thread (for demo purposes only)
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("1", "Weather notification channel", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
 
         weatherStatus = findViewById(R.id.weather_status);
 
@@ -78,6 +96,27 @@ public class WeatherComp extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            //Push notification
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(WeatherComp.this, "1")
+                                    .setSmallIcon(R.drawable.ic_app)
+                                    .setContentTitle("Weather")
+                                    .setContentText("Weather: " + weatherDescription + "\nTemperature: " + temperature)
+                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                            NotificationManagerCompat managerCompat = NotificationManagerCompat.from(WeatherComp.this);
+                            if (ActivityCompat.checkSelfPermission(WeatherComp.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                                // TODO: Consider calling
+                                //    ActivityCompat#requestPermissions
+                                // here to request the missing permissions, and then overriding
+                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                //                                          int[] grantResults)
+                                // to handle the case where the user grants the permission. See the documentation
+                                // for ActivityCompat#requestPermissions for more details.
+                                ActivityCompat.requestPermissions(WeatherComp.this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
+                                return;
+                            }
+                            managerCompat.notify(1, builder.build());
+
+                            //Update weather information
                             weatherStatus.setText("Weather: " + weatherDescription + "\nTemperature: " + temperature);
                         }
                     });
