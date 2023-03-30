@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -39,7 +40,6 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        getSupportActionBar().hide();
 
         username = findViewById(R.id.username);
         email = findViewById(R.id.email);
@@ -66,22 +66,41 @@ public class RegisterActivity extends AppCompatActivity {
                 String email_Txt = String.valueOf(email.getText());
                 String password_Txt = String.valueOf(password.getText());
 
-                if(TextUtils.isEmpty(username_Txt) || TextUtils.isEmpty(password_Txt)
-                || TextUtils.isEmpty(email_Txt)){
-                    Toast.makeText(
-                            getApplicationContext(),
-                            "All field must be filled",
-                            Toast.LENGTH_SHORT).show();
-                }
-                else if (!is_Valid_Password(password_Txt)) {
-                    Toast.makeText(
-                            getApplicationContext(),
-                            "Invalid password",
-                            Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    register(username_Txt, password_Txt, email_Txt);
-                }
+                //check exist email
+                auth.fetchSignInMethodsForEmail(email_Txt).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+                        if (task.getResult().getSignInMethods().size() == 0){
+                            if(TextUtils.isEmpty(username_Txt) || TextUtils.isEmpty(password_Txt)
+                                    || TextUtils.isEmpty(email_Txt)){
+                                Toast.makeText(
+                                        getApplicationContext(),
+                                        "All field must be filled",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            else if (!is_Valid_Password(password_Txt)) {
+                                Toast.makeText(
+                                        getApplicationContext(),
+                                        "Invalid password",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                register(username_Txt, password_Txt, email_Txt);
+                            }
+                        } else {
+                            Toast.makeText(
+                                    getApplicationContext(),
+                                    "Your email has already created",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+
             }
         });
     }
