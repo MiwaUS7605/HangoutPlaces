@@ -3,28 +3,34 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentRight="true"
-    android:padding="8dp"
-    android:layout_marginBottom="10dp">
+    android:layout_marginBottom="10dp"
+    android:padding="8dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/ic_launcher"
-        android:id="@+id/profile_image"
-        android:visibility="gone">
-    </de.hdodenhof.circleimageview.CircleImageView>
+        android:visibility="gone"></de.hdodenhof.circleimageview.CircleImageView>
 
     <TextView
         android:id="@+id/show_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/profile_image"
-        android:text="hello this is a message"
-        android:padding="8dp"
         android:layout_alignParentEnd="true"
         android:layout_marginLeft="5dp"
-        android:background="@drawable/background_right">
+        android:layout_toRightOf="@+id/profile_image"
+        android:background="@drawable/background_right"
+        android:padding="8dp"
+        android:text="hello this is a message"></TextView>
 
-    </TextView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_seen"
+        android:layout_below="@+id/show_message"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        ></TextView>
 
 </RelativeLayout>

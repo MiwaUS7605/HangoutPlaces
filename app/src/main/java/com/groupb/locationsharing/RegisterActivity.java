@@ -139,6 +139,8 @@ public class RegisterActivity extends AppCompatActivity {
                             hashMap.put("id", userid);
                             hashMap.put("username", username);
                             hashMap.put("imageUrl", "default");
+                            hashMap.put("status", "offline");
+                            hashMap.put("name", username.toLowerCase());
                             reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
