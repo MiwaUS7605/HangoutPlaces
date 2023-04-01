@@ -45,6 +45,7 @@ public class MessageActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     Intent intent;
     ValueEventListener seenListener;
+    String userid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,7 @@ public class MessageActivity extends AppCompatActivity {
         sendBtn = findViewById(R.id.btnSend);
         textSend = findViewById(R.id.textSend);
         intent = getIntent();
-        String userid = intent.getStringExtra("userid");
+        userid = intent.getStringExtra("userid");
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,7 +100,7 @@ public class MessageActivity extends AppCompatActivity {
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 }
                 else{
-                    Glide.with(getApplicationContext()).load(user.getImageUrl());
+                    Glide.with(MessageActivity.this).load(user.getImageUrl()).into(profile_image);
                 }
                 readMessage(firebaseUser.getUid(), userid, user.getImageUrl());
             }
@@ -148,6 +149,23 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("isseen", false);
 
         databaseReference.child("Chats").push().setValue(hashMap);
+
+        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
+                .child(firebaseUser.getUid()).child(userid);
+        chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    chatRef.child("id").setValue(userid);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     private void readMessage(String myid, String userid, String imageUrl){
