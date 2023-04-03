@@ -3,14 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#A0B8B6"
+    android:background="#101010"
     android:layout_marginBottom="5dp">
     
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@mipmap/ic_launcher">
+        android:src="@mipmap/ic_launcher"
+        android:layout_margin="5dp">
     </de.hdodenhof.circleimageview.CircleImageView>
     <TextView
         android:id="@+id/username"
@@ -20,8 +21,8 @@
         android:layout_toRightOf="@+id/profile_image"
         android:layout_toEndOf="@+id/profile_image"
         android:layout_marginLeft="10dp"
-        android:layout_centerVertical="true"
-        android:textSize="18dp">
+        android:textSize="18dp"
+        android:textColor="#ffff">
     </TextView>
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -54,6 +55,17 @@
         android:layout_toEndOf="@+id/profile_image"
         ></de.hdodenhof.circleimageview.CircleImageView>
 
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/username"
+        android:layout_toRightOf="@id/profile_image"
+        android:layout_marginTop="5dp"
+        android:id="@+id/last_msg"
+        android:textColor="#9A9090"
+        android:text="this is the last message"
+        android:layout_marginLeft="10dp"
+        android:maxLines="1"
+        ></TextView>
 
 </RelativeLayout>
