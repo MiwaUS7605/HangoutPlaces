@@ -4,6 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#808080"
+    android:background="#000000"
     tools:context=".Fragments.ChatsFragment"
     android:id="@+id/recycler_view"/>
