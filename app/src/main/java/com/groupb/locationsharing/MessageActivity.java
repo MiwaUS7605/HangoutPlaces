@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,16 +22,26 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.groupb.locationsharing.Adapter.MessageAdapter;
+import com.groupb.locationsharing.Fragments.APIService;
 import com.groupb.locationsharing.Model.Chat;
 import com.groupb.locationsharing.Model.User;
+import com.groupb.locationsharing.Service.Notifications.Client;
+import com.groupb.locationsharing.Service.Notifications.Data;
+import com.groupb.locationsharing.Service.Notifications.MyResponse;
+import com.groupb.locationsharing.Service.Notifications.Sender;
+import com.groupb.locationsharing.Service.Notifications.Token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -46,6 +57,8 @@ public class MessageActivity extends AppCompatActivity {
     Intent intent;
     ValueEventListener seenListener;
     String userid;
+    APIService apiService;
+    boolean notify = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +76,9 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+
+
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -79,8 +95,9 @@ public class MessageActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                notify = true;
                 String msg = textSend.getText().toString();
-                if(!msg.equals("")){
+                if (!msg.equals("")) {
                     sendMessage(firebaseUser.getUid(), userid, msg);
                 }
                 textSend.setText("");
@@ -95,10 +112,9 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 username.setText(user.getUsername());
-                if(user.getImageUrl().equals("default")){
+                if (user.getImageUrl().equals("default")) {
                     profile_image.setImageResource(R.mipmap.ic_launcher);
-                }
-                else{
+                } else {
                     Glide.with(MessageActivity.this).load(user.getImageUrl()).into(profile_image);
                 }
                 readMessage(firebaseUser.getUid(), userid, user.getImageUrl());
@@ -113,15 +129,15 @@ public class MessageActivity extends AppCompatActivity {
         seenMessage(userid);
     }
 
-    private void seenMessage(String userid){
+    private void seenMessage(String userid) {
         reference = FirebaseDatabase.getInstance().getReference("Chats");
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Chat chat = snapshot.getValue(Chat.class);
                     assert chat != null;
-                    if(chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userid)){
+                    if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userid)) {
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("isseen", true);
                         snapshot.getRef().updateChildren(hashMap);
@@ -137,7 +153,7 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void sendMessage(String sender, String receiver, String message){
+    private void sendMessage(String sender, String receiver, String message) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
         HashMap<String, Object> hashMap = new HashMap<>();
@@ -154,7 +170,7 @@ public class MessageActivity extends AppCompatActivity {
         chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
+                if (!dataSnapshot.exists()) {
                     chatRef.child("id").setValue(userid);
                 }
             }
@@ -165,9 +181,65 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
+        final String msg = message;
+
+        reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if (notify) {
+                    sendNotifications(receiver, user.getUsername(), msg);
+                }
+                notify = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
-    private void readMessage(String myid, String userid, String imageUrl){
+    private void sendNotifications(String receiver, final String username, final String msg) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(firebaseUser.getUid(), R.mipmap.ic_launcher
+                            , username + ": " + msg
+                            , "You have a new message", userid);
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotifications(sender).enqueue(new Callback<MyResponse>() {
+                        @Override
+                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                            if (response.code() == 200) {
+                                if (response.body().success == 1) {
+                                    Toast.makeText(getApplicationContext(), "Failed!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void readMessage(String myid, String userid, String imageUrl) {
         mChat = new ArrayList<>();
 
         reference = FirebaseDatabase.getInstance().getReference("Chats");
@@ -175,10 +247,10 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mChat.clear();
-                for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Chat chat = snapshot.getValue(Chat.class);
-                    if(chat.getReceiver().equals(myid) && chat.getSender().equals(userid) ||
-                            chat.getReceiver().equals(userid) && chat.getSender().equals(myid)){
+                    if (chat.getReceiver().equals(myid) && chat.getSender().equals(userid) ||
+                            chat.getReceiver().equals(userid) && chat.getSender().equals(myid)) {
                         mChat.add(chat);
                     }
                     messageAdapter = new MessageAdapter(MessageActivity.this, mChat, imageUrl);
@@ -192,7 +264,8 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
     }
-    private void status(String status){
+
+    private void status(String status) {
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
 
         HashMap<String, Object> hashMap = new HashMap<>();
