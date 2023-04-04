@@ -18,11 +18,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.groupb.locationsharing.Adapter.UserAdapter;
 import com.groupb.locationsharing.Model.Chat;
 import com.groupb.locationsharing.Model.Chatlist;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
+import com.groupb.locationsharing.Service.Notifications.Token;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +70,15 @@ public class ChatsFragment extends Fragment {
             }
         });
 
+        updateToken(FirebaseMessaging.getInstance().getToken().toString());
+
         return view;
+    }
+
+    private void updateToken(String token){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        Token token1 = new Token(token);
+        databaseReference.child(firebaseUser.getUid()).setValue(token1);
     }
 
     private void chatList(){

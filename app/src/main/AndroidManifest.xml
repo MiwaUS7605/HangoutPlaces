@@ -46,6 +46,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".Service.Notifications.PushNotificationsService"
+            android:exported="true" android:enabled="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTACE_ID_EVENT"></action>
+            </intent-filter>
+        </service>
+        <service android:name=".Service.Notifications.MyFirebaseMessaging"
+            android:exported="true" android:enabled="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"></action>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
