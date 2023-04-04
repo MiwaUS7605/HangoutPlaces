@@ -21,4 +21,6 @@
 
     <!--colros for card-->
     <color name="whiteCardColor">#fff</color>
+
+    <color name="purple">#8692f7</color>
 </resources>
