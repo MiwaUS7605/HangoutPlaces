@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#101010"
+    android:background="@drawable/item_bg"
     android:layout_marginBottom="5dp">
     
     <de.hdodenhof.circleimageview.CircleImageView
@@ -22,6 +22,7 @@
         android:layout_toEndOf="@+id/profile_image"
         android:layout_marginLeft="10dp"
         android:textSize="18dp"
+        android:textStyle="bold"
         android:textColor="#ffff">
     </TextView>
 
@@ -62,7 +63,8 @@
         android:layout_toRightOf="@id/profile_image"
         android:layout_marginTop="5dp"
         android:id="@+id/last_msg"
-        android:textColor="#9A9090"
+        android:textColor="#ffff"
+        android:textStyle="italic"
         android:text="this is the last message"
         android:layout_marginLeft="10dp"
         android:maxLines="1"
