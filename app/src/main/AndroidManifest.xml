@@ -2,9 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!--<uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> -->
     <!-- Always include this permission -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -46,16 +47,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".Service.Notifications.PushNotificationsService"
-            android:exported="true" android:enabled="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTACE_ID_EVENT"></action>
-            </intent-filter>
-        </service>
+
         <service android:name=".Service.Notifications.MyFirebaseMessaging"
-            android:exported="true" android:enabled="true">
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"></action>
+                <action android:name="com.google.firebase.INSTACE_EVENT" />
+                <action android:name="com.google.firebase.INSTACE_ID_EVENT" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
     </application>

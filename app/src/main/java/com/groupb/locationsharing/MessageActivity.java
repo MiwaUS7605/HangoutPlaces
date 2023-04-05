@@ -115,7 +115,7 @@ public class MessageActivity extends AppCompatActivity {
                 if (user.getImageUrl().equals("default")) {
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 } else {
-                    Glide.with(MessageActivity.this).load(user.getImageUrl()).into(profile_image);
+                    Glide.with(getApplicationContext()).load(user.getImageUrl()).into(profile_image);
                 }
                 readMessage(firebaseUser.getUid(), userid, user.getImageUrl());
             }
@@ -209,16 +209,20 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(firebaseUser.getUid(), R.mipmap.ic_launcher
+                    Data data = new Data(firebaseUser.getUid()
+                            , R.mipmap.ic_launcher
                             , username + ": " + msg
-                            , "You have a new message", userid);
+                            , "You have a new message"
+                            , userid);
                     Sender sender = new Sender(data, token.getToken());
+
+                    //Toast.makeText(getApplicationContext(), sender.data.toString() + "\n" + sender.to, Toast.LENGTH_SHORT).show();
 
                     apiService.sendNotifications(sender).enqueue(new Callback<MyResponse>() {
                         @Override
                         public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                             if (response.code() == 200) {
-                                if (response.body().success == 1) {
+                                if (response.body().success != 1) {
                                     Toast.makeText(getApplicationContext(), "Failed!", Toast.LENGTH_SHORT).show();
                                 }
                             }
