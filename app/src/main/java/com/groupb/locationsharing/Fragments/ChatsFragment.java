@@ -1,5 +1,7 @@
 package com.groupb.locationsharing.Fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -7,10 +9,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -70,13 +76,27 @@ public class ChatsFragment extends Fragment {
             }
         });
 
-        updateToken(FirebaseMessaging.getInstance().getToken().toString());
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
 
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        //Toast.makeText(getContext(), token, Toast.LENGTH_SHORT).show();
+                        // Log and/or update token as needed
+                        updateToken(token);
+                    }
+                });
         return view;
     }
 
     private void updateToken(String token){
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Tokens");
         Token token1 = new Token(token);
         databaseReference.child(firebaseUser.getUid()).setValue(token1);
     }
