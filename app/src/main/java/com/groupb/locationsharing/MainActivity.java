@@ -10,7 +10,11 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -18,6 +22,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,7 +32,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.groupb.locationsharing.Fragments.ChatsFragment;
+import com.groupb.locationsharing.Fragments.NewsFeedFragment;
+import com.groupb.locationsharing.Fragments.NotificationFragment;
 import com.groupb.locationsharing.Fragments.ProfileFragment;
+import com.groupb.locationsharing.Fragments.SearchFragment;
 import com.groupb.locationsharing.Fragments.UsersFragment;
 import com.groupb.locationsharing.Model.User;
 
@@ -37,93 +45,67 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
-
-    CircleImageView profile_image;
-    TextView username;
     FirebaseUser firebaseUser;
     DatabaseReference reference;
     Button logoutBtn;
+
+    BottomNavigationView bottomNavigationView;
+    Fragment selectedFragment = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
-
-//        logoutBtn = findViewById(R.id.logout);
-//        logoutBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                FirebaseAuth.getInstance().signOut();
-//                startActivity(new Intent(MainActivity.this, StartActivity.class));
-//                finish();
-//            }
-//        });
-        profile_image = findViewById(R.id.profile_image);
-        username = findViewById(R.id.username);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
 
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-                username.setText(user.getUsername());
-                if(user.getImageUrl().equals("default")){
-                    profile_image.setImageResource(R.mipmap.ic_launcher);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container
+                , new NewsFeedFragment()).commit();
+
+    }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()){
+                        case R.id.nav_home:
+                            selectedFragment = new NewsFeedFragment();
+                            break;
+                        case R.id.nav_search:
+                            selectedFragment = new SearchFragment();
+                            break;
+                        case R.id.nav_add:
+                            selectedFragment = null;
+                            startActivity(new Intent(getApplicationContext(), AddPostActivity.class));
+                            break;
+                        case R.id.nav_heart:
+                            selectedFragment = new NotificationFragment();
+                            break;
+                        case R.id.nav_profile:
+                            selectedFragment = new ProfileFragment();
+                            break;
+                    }
+                    if (selectedFragment!=null){
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container
+                        , selectedFragment).commit();
+                    }
+                    return true;
                 }
-                else{
-                    Glide.with(getApplicationContext()).load(user.getImageUrl()).into(profile_image);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
-        ViewPager viewPager = findViewById(R.id.viewpager_layout);
-
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-        viewPagerAdapter.addFragment(new ChatsFragment(), "Chats");
-        viewPagerAdapter.addFragment(new UsersFragment(), "Users");
-        viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
-
-        viewPager.setAdapter(viewPagerAdapter);
-
-        tabLayout.setupWithViewPager(viewPager);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.logout:
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(MainActivity.this, StartActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                return true;
-        }
-        return false;
-    }
+            };
 
     class ViewPagerAdapter extends FragmentPagerAdapter{
 
         private ArrayList<Fragment> fragments;
         private ArrayList<String> titles;
+        private ArrayList<Drawable> icons;
         ViewPagerAdapter(FragmentManager fragmentManager){
             super(fragmentManager);
             this.fragments = new ArrayList<>();
             this.titles = new ArrayList<>();
+            this.icons = new ArrayList<>();
         }
         @NonNull
         @Override
@@ -135,15 +117,21 @@ public class MainActivity extends AppCompatActivity {
         public int getCount() {
             return fragments.size();
         }
-        public void addFragment(Fragment fg, String title){
+        public void addFragment(Fragment fg, String title, Drawable icon){ // add the icon as a parameter
             fragments.add(fg);
             titles.add(title);
+            icons.add(icon);
         }
 
         @Nullable
         @Override
         public CharSequence getPageTitle(int position) {
-            return titles.get(position);
+            Drawable image = icons.get(position);
+            image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
+            SpannableString sb = new SpannableString(" ");
+            ImageSpan imageSpan = new ImageSpan(image, ImageSpan.ALIGN_BOTTOM);
+            sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return sb;
         }
     }
 
