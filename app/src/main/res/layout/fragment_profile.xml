@@ -1,44 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"
     tools:context=".Fragments.ProfileFragment">
-    
-    <androidx.cardview.widget.CardView
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <RelativeLayout
+            android:id="@+id/background_img"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp">
+            android:layout_height="140dp"
+            android:background="@drawable/background">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textStyle="bold">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
             </TextView>
-            
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:orientation="vertical">
+
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
                 android:id="@+id/profile_image"
-                android:src="@mipmap/ic_launcher"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="50dp">
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center">
             </de.hdodenhof.circleimageview.CircleImageView>
-            
+
             <TextView
+                android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/profile_image"
-                android:text="USERNAME"
-                android:layout_marginTop="15dp"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/username"></TextView>
-        </RelativeLayout>
-    </androidx.cardview.widget.CardView>
+                android:layout_gravity="center"
+                android:textSize="25dp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF">
+            </TextView>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+                <Button
+                    android:id="@+id/addNewPost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+ Add a Post"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/item_bg">
+                </Button>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="# Update your profile"
+                    android:background="@drawable/background_button"
+                    android:id="@+id/logout">
+                </Button>
+            </LinearLayout>
 
-</RelativeLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/custom_edittext"
+                android:layout_margin="10dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Introduction"
+                    android:textSize="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:textStyle="bold"
+                    android:textColorHighlight="#807676"
+                    android:textColor="#FFFFFF">
+                </TextView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="This is your bio"
+                    android:textStyle="italic"
+                    android:textSize="15dp"
+                    android:textColor="@color/white"
+                    android:layout_margin="10dp">
+                </TextView>
+
+            </LinearLayout>
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/your_feeds">
+            </ListView>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</ScrollView>

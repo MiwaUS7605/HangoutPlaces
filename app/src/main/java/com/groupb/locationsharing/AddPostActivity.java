@@ -1,22 +1,19 @@
-package com.groupb.locationsharing.Fragments;
+package com.groupb.locationsharing;
 
-import static android.app.Activity.RESULT_OK;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,82 +24,74 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
-import com.groupb.locationsharing.AddPostActivity;
-import com.groupb.locationsharing.Model.User;
-import com.groupb.locationsharing.R;
 
 import java.util.HashMap;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileFragment extends Fragment {
-    CircleImageView profile_image;
-    TextView username;
-    Button addNewPost;
+public class AddPostActivity extends AppCompatActivity {
 
+    Uri imageUri;
+    String myUrl;
+    StorageTask uploadTask;
+    StorageReference storageReference;
     DatabaseReference databaseReference;
     FirebaseUser firebaseUser;
-    StorageReference storageReference;
+    ImageView close, imageView;
+    TextView post;
+    EditText description;
+    Button browseBtn;
+    HashMap<String, Object> map;
     private static final int IMAGE_REQUEST = 1;
-    private Uri imageUri;
-    private StorageTask uploadTask;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_post);
 
-        profile_image = view.findViewById(R.id.profile_image);
-        username = view.findViewById(R.id.username);
-        addNewPost = view.findViewById(R.id.addNewPost);
+        close = findViewById(R.id.close);
+        imageView = findViewById(R.id.added_image);
+        post = findViewById(R.id.post);
+        description = findViewById(R.id.description);
+        browseBtn = findViewById(R.id.browseBtn);
 
-        storageReference = FirebaseStorage.getInstance().getReference("uploads");
+        storageReference = FirebaseStorage.getInstance().getReference("posts");
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        close.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-                username.setText(user.getUsername());
-                if (user.getImageUrl().equals("default")) {
-                    profile_image.setImageResource(R.mipmap.ic_launcher);
-                } else {
-                    Glide.with(getContext()).load(user.getImageUrl()).into(profile_image);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                finish();
             }
         });
 
-        profile_image.setOnClickListener(new View.OnClickListener() {
+        browseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openImage();
             }
         });
 
-        addNewPost.setOnClickListener(new View.OnClickListener() {
+        post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getContext(), AddPostActivity.class));
+                if (imageUri == null) {
+                    Toast.makeText(getApplicationContext(), "No image selected", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                map.put("postDescription", description.getText().toString());
+                databaseReference.push().setValue(map);
+                startActivity(new Intent(AddPostActivity.this, MainActivity.class));
+                finish();
+                Toast.makeText(getApplicationContext(), "SUCCESSFUL", Toast.LENGTH_SHORT);
             }
         });
-
-        return view;
     }
 
     private void openImage() {
@@ -113,13 +102,13 @@ public class ProfileFragment extends Fragment {
     }
 
     private String getFileExtension(Uri uri) {
-        ContentResolver contentResolver = getContext().getContentResolver();
+        ContentResolver contentResolver = getApplicationContext().getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
-    private void uploadImage() {
-        final ProgressDialog pd = new ProgressDialog(getContext());
+    private void uploadImage(){
+        final ProgressDialog pd = new ProgressDialog(this);
         pd.setMessage("Uploading");
         pd.show();
 
@@ -143,41 +132,43 @@ public class ProfileFragment extends Fragment {
                         Uri downloadUri = task.getResult();
                         String mUri = downloadUri.toString();
 
-                        databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+                        databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
 
-                        HashMap<String, Object> map = new HashMap<>();
+                        map = new HashMap<>();
+                        map.put("postId", databaseReference.push().getKey());
+                        map.put("postImage", mUri);
+                        map.put("publisher", firebaseUser.getUid());
 
-                        map.put("imageUrl", mUri);
-
-                        databaseReference.updateChildren(map);
 
                         pd.dismiss();
+
+                        Glide.with(getApplicationContext()).load(mUri).into(imageView);
                     } else {
-                        Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
                         pd.dismiss();
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    pd.dismiss();
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    //pd.dismiss();
                 }
             });
         } else {
-            Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "No image selected", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             imageUri = data.getData();
             if(uploadTask!=null&&uploadTask.isInProgress()){
-                Toast.makeText(getContext(), "Upload in progress", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Upload in progress", Toast.LENGTH_SHORT).show();
             }
             else{
                 uploadImage();
