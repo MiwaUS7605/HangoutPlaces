@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/white"
     android:backgroundTint="@color/black">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -34,12 +35,16 @@
         <ImageView
             android:id="@+id/post_image"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/top"
+            android:layout_marginTop="20dp"
+            android:adjustViewBounds="true"
             android:padding="8dp"
-            android:scaleType="centerCrop"
-            android:adjustViewBounds="true"></ImageView>
+            android:scaleType="centerCrop"></ImageView>
 
         <RelativeLayout
+            android:id="@+id/body"
+            android:layout_below="@id/post_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp">
@@ -81,8 +86,10 @@
         </RelativeLayout>
 
         <LinearLayout
+            android:layout_below="@+id/body"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:id="@id/bottom">
 
             <TextView
                 android:id="@+id/publisher"
@@ -107,9 +114,10 @@
             android:layout_marginLeft="10dp"
             android:text="View all comments"
             android:textColor="#C1C0C0"
-            android:textStyle="italic">
+            android:textStyle="italic"
+            android:layout_below="@+id/bottom">
 
         </TextView>
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
