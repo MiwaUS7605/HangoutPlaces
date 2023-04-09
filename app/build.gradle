@@ -67,6 +67,7 @@ dependencies {
     implementation 'androidx.work:work-runtime:2.8.1'
     implementation 'com.squareup.picasso:picasso:2.8'
     //implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
+    implementation 'com.rengwuxian.materialedittext:library:2.1.4'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -51,6 +51,7 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.groupb.locationsharing.Adapter.PhotoAdapter;
 import com.groupb.locationsharing.AddPostActivity;
+import com.groupb.locationsharing.EditProfileActivity;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
@@ -133,7 +134,7 @@ public class ProfileFragment extends Fragment {
                 String btn = edit_profile.getText().toString();
 
                 if (btn.equals("Edit your profile")) {
-                    // TODO: Go to EditProfile
+                    startActivity(new Intent(getContext(), EditProfileActivity.class));
                 } else if (btn.equals("FOLLOW")) {
                     FirebaseDatabase.getInstance().getReference().child("Follow")
                             .child(firebaseUser.getUid()).child("following")

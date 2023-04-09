@@ -11,8 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,74 +22,92 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.groupb.locationsharing.Model.User;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.HashMap;
 
+public class EditProfileActivity extends AppCompatActivity {
 
-public class AddPostActivity extends AppCompatActivity {
-
-    Uri imageUri;
-    StorageTask uploadTask;
-    StorageReference storageReference;
-    DatabaseReference databaseReference;
+    ImageView close, profile_image;
+    TextView save, tv_change;
+    MaterialEditText fullname, username, bio;
     FirebaseUser firebaseUser;
-    ImageView close, imageView;
-    TextView post;
-    EditText description;
-    Button browseBtn;
-    HashMap<String, Object> map;
+    DatabaseReference databaseReference;
+    private Uri imageUri;
+    private StorageTask uploadTask;
+    StorageReference storageReference;
     private static final int IMAGE_REQUEST = 1;
+    HashMap <String, Object> map;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_post);
+        setContentView(R.layout.activity_edit_profile);
 
         close = findViewById(R.id.close);
-        imageView = findViewById(R.id.added_image);
-        post = findViewById(R.id.post);
-        description = findViewById(R.id.description);
-        browseBtn = findViewById(R.id.browseBtn);
-
-        storageReference = FirebaseStorage.getInstance().getReference("posts");
+        profile_image = findViewById(R.id.profile_image);
+        save = findViewById(R.id.save);
+        tv_change = findViewById(R.id.tv_change);
+        fullname = findViewById(R.id.fullname);
+        username = findViewById(R.id.username);
+        bio = findViewById(R.id.bio);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        storageReference = FirebaseStorage.getInstance().getReference("uploads");
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+                fullname.setText(user.getFullname());
+                username.setText(user.getUsername());
+                bio.setText(user.getBio());
+                if (user.getImageUrl().equals("default")) {
+                    profile_image.setImageResource(R.mipmap.ic_launcher);
+                } else {
+                    Glide.with(getApplicationContext()).load(user.getImageUrl()).into(profile_image);
+                }
+                map = new HashMap<>();
+                map.put("imageUrl", user.getImageUrl());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 finish();
             }
         });
 
-        browseBtn.setOnClickListener(new View.OnClickListener() {
+        tv_change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openImage();
             }
         });
-
-        post.setOnClickListener(new View.OnClickListener() {
+        save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (imageUri == null) {
-                    Toast.makeText(getApplicationContext(), "No image selected", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String postId = databaseReference.push().getKey();
-                map.put("postId", postId);
-                map.put("postDescription", description.getText().toString());
-                databaseReference.child(postId).setValue(map);
-
-                startActivity(new Intent(AddPostActivity.this, MainActivity.class));
-                finish();
-                Toast.makeText(getApplicationContext(), "SUCCESSFUL", Toast.LENGTH_SHORT);
+                map.put("fullname", fullname.getText().toString());
+                map.put("username", username.getText().toString());
+                map.put("bio", bio.getText().toString());
+                reference.updateChildren(map);
             }
         });
     }
@@ -102,7 +118,21 @@ public class AddPostActivity extends AppCompatActivity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, IMAGE_REQUEST);
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            if(uploadTask!=null&&uploadTask.isInProgress()){
+                Toast.makeText(getApplicationContext(), "Upload in progress", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                uploadImage();
+            }
+        }
+    }
     private String getFileExtension(Uri uri) {
         ContentResolver contentResolver = getApplicationContext().getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
@@ -134,16 +164,17 @@ public class AddPostActivity extends AppCompatActivity {
                         Uri downloadUri = task.getResult();
                         String mUri = downloadUri.toString();
 
-                        databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
+                        databaseReference = FirebaseDatabase.getInstance()
+                                .getReference("Users").child(firebaseUser.getUid());
 
                         String postId = databaseReference.push().getKey();
                         map = new HashMap<>();
-                        map.put("postImage", mUri);
-                        map.put("publisher", firebaseUser.getUid());
+
+                        map.put("imageUrl", imageUri);
 
                         pd.dismiss();
 
-                        Glide.with(getApplicationContext()).load(mUri).into(imageView);
+                        Glide.with(getApplicationContext()).load(mUri).into(profile_image);
                     } else {
                         Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
                         pd.dismiss();
@@ -158,22 +189,6 @@ public class AddPostActivity extends AppCompatActivity {
             });
         } else {
             Toast.makeText(getApplicationContext(), "No image selected", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            if(uploadTask!=null&&uploadTask.isInProgress()){
-                Toast.makeText(getApplicationContext(), "Upload in progress", Toast.LENGTH_SHORT).show();
-            }
-            else{
-                uploadImage();
-            }
         }
     }
 }

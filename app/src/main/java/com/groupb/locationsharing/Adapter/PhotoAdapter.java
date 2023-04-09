@@ -1,15 +1,18 @@
 package com.groupb.locationsharing.Adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.groupb.locationsharing.Fragments.PostDetailFragment;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.R;
 
@@ -36,6 +39,18 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         Post post = mPosts.get(position);
 
         Glide.with(mContext).load(post.getPostImage()).into(holder.post_images);
+
+        holder.post_images.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                editor.putString("postId", post.getPostId());
+                editor.apply();
+
+                ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
+            }
+        });
     }
 
     @Override
