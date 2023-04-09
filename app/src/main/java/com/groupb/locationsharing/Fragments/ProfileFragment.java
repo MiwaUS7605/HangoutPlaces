@@ -74,6 +74,12 @@ public class ProfileFragment extends Fragment {
     PhotoAdapter photoAdapter;
     List<Post> postList;
 
+    DatabaseReference databaseReference;
+    StorageReference storageReference;
+    private static final int IMAGE_REQUEST = 1;
+    private Uri imageUri;
+    private StorageTask uploadTask;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -106,8 +112,17 @@ public class ProfileFragment extends Fragment {
         getNumber();
         myPhotos();
 
+        storageReference = FirebaseStorage.getInstance().getReference("uploads");
+
         if (profileId.equals(firebaseUser.getUid())){
             edit_profile.setText("Edit your profile");
+            profile_image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    openImage();
+                }
+            });
+
         }
         else {
             checkFollow();
@@ -264,4 +279,84 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
+    private void openImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, IMAGE_REQUEST);
+    }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver contentResolver = getContext().getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+    private void uploadImage() {
+        final ProgressDialog pd = new ProgressDialog(getContext());
+        pd.setMessage("Uploading");
+        pd.show();
+
+        if (imageUri != null) {
+            final StorageReference reference = storageReference.child(System.currentTimeMillis()
+                    + "." + getFileExtension(imageUri));
+            uploadTask = reference.putFile(imageUri);
+            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    return reference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        String mUri = downloadUri.toString();
+
+                        databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+
+                        HashMap<String, Object> map = new HashMap<>();
+
+                        map.put("imageUrl", mUri);
+
+                        databaseReference.updateChildren(map);
+
+                        pd.dismiss();
+                    } else {
+                        Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                        pd.dismiss();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    pd.dismiss();
+                }
+            });
+        } else {
+            Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            if(uploadTask!=null&&uploadTask.isInProgress()){
+                Toast.makeText(getContext(), "Upload in progress", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                uploadImage();
+            }
+        }
+    }
+
 }

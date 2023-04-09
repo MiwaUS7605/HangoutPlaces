@@ -3,34 +3,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.NewsFeedFragment"
-    android:background="@color/black">
+    android:background="@color/black"
+    tools:context=".Fragments.NewsFeedFragment">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
-        android:id="@+id/bar">
+        android:background="?android:attr/windowBackground">
+
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/black">
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/black">
+
                 <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="180dp"
                     android:layout_height="35dp"
-                    android:background="@drawable/logo">
-                </ImageView>
+                    android:background="@drawable/logo"></ImageView>
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/chat_ico"
                     android:layout_alignParentEnd="true"
                     android:layout_marginRight="10dp"
-                    >
+                    android:background="@drawable/chat_ico">
 
                 </ImageView>
             </RelativeLayout>
@@ -38,9 +40,9 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/recycler_view"
         android:layout_below="@id/bar">
 
     </androidx.recyclerview.widget.RecyclerView>

@@ -96,7 +96,8 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(new Intent(getApplicationContext(), AddPostActivity.class));
                             break;
                         case R.id.nav_heart:
-                            selectedFragment = new NotificationFragment();
+                            //selectedFragment = new NotificationFragment();
+                            selectedFragment = new ChatsFragment();
                             break;
                         case R.id.nav_profile:
                             SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
@@ -112,45 +113,6 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
             };
-
-    class ViewPagerAdapter extends FragmentPagerAdapter{
-
-        private ArrayList<Fragment> fragments;
-        private ArrayList<String> titles;
-        private ArrayList<Drawable> icons;
-        ViewPagerAdapter(FragmentManager fragmentManager){
-            super(fragmentManager);
-            this.fragments = new ArrayList<>();
-            this.titles = new ArrayList<>();
-            this.icons = new ArrayList<>();
-        }
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            return fragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return fragments.size();
-        }
-        public void addFragment(Fragment fg, String title, Drawable icon){ // add the icon as a parameter
-            fragments.add(fg);
-            titles.add(title);
-            icons.add(icon);
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            Drawable image = icons.get(position);
-            image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
-            SpannableString sb = new SpannableString(" ");
-            ImageSpan imageSpan = new ImageSpan(image, ImageSpan.ALIGN_BOTTOM);
-            sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            return sb;
-        }
-    }
 
     private void status(String status){
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
@@ -173,4 +135,5 @@ public class MainActivity extends AppCompatActivity {
 
         status("offline");
     }
+
 }
