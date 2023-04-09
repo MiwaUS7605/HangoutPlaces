@@ -7,12 +7,12 @@
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\Admin\.android\avd\Resizable_Experimental_API_UpsideDownCake.avd" />
+            <value value="C:\Users\Admin\.android\avd\Pixel_6_Pro_API_UpsideDownCake.avd" />
           </Key>
         </deviceKey>
       </Target>
     </targetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2023-04-07T22:04:05.749095700Z" />
+    <timeTargetWasSelectedWithDropDown value="2023-04-08T23:01:46.059721400Z" />
     <targetsSelectedWithDialog>
       <Target>
         <type value="QUICK_BOOT_TARGET" />
