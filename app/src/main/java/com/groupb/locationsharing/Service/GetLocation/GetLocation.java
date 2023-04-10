@@ -13,24 +13,14 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
-public class GetLocation extends Service {
+class GetLocation extends Service{
     String GPS_FILTER = "matos.action.GPSFIX";
     Thread serviceThread;
     LocationManager lm;
     GPSListener myLocationListener;
-
-    @Override
-    public IBinder onBind(Intent arg0) {
-        return null;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
     @Override
     public void onStart(Intent intent, int startId) {
         Log.e("<<MyGpsService-onStart>>", "I am alive-GPS!");
@@ -41,7 +31,6 @@ public class GetLocation extends Service {
         });
         serviceThread.start();
     }// onStar
-
     public void getGPSFix_Version2() {
         try {
             Looper.prepare();
@@ -68,15 +57,13 @@ public class GetLocation extends Service {
         }
         catch (Exception e) { e.printStackTrace(); }
     }
+
+    @Nullable
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.e("<<MyGpsService-onDestroy>>", "I am dead-GPS");
-        try {
-            lm.removeUpdates(myLocationListener);
-        }
-        catch (Exception e) { e.printStackTrace(); }
-    }// onDestroy
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
     private class GPSListener implements LocationListener {
         public void onLocationChanged(Location location) {
 // capture location data sent by current provider
