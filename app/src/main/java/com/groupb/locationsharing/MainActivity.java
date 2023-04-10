@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.groupb.locationsharing.Fragments.ChatsFragment;
+import com.groupb.locationsharing.Fragments.MapsFrag;
 import com.groupb.locationsharing.Fragments.NewsFeedFragment;
 import com.groupb.locationsharing.Fragments.NotificationFragment;
 import com.groupb.locationsharing.Fragments.ProfileFragment;
@@ -92,8 +93,9 @@ public class MainActivity extends AppCompatActivity {
                             selectedFragment = new SearchFragment();
                             break;
                         case R.id.nav_add:
-                            selectedFragment = null;
-                            startActivity(new Intent(getApplicationContext(), AddPostActivity.class));
+//                            selectedFragment = null;
+//                            startActivity(new Intent(getApplicationContext(), AddPostActivity.class));
+                            selectedFragment = new MapsFrag();
                             break;
                         case R.id.nav_heart:
                             //selectedFragment = new NotificationFragment();
