@@ -28,6 +28,7 @@
                     android:background="@drawable/logo"></ImageView>
 
                 <ImageView
+                    android:id="@+id/nav_chat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"

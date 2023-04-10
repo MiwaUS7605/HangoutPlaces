@@ -25,6 +25,7 @@ import com.groupb.locationsharing.Fragments.ProfileFragment;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
 
+import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -93,6 +94,7 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
                     FirebaseDatabase.getInstance().getReference().child("Follow")
                             .child(user.getId()).child("followers")
                             .child(firebaseUser.getUid()).setValue(true);
+                    addNotifications(user.getId());
                 } else{
                     FirebaseDatabase.getInstance().getReference().child("Follow")
                             .child(firebaseUser.getUid()).child("following")
@@ -145,5 +147,15 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
             }
         });
     }
+    private void addNotifications(String userId){
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference("Notifications").child(userId);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("userId", firebaseUser.getUid());
+        map.put("text", "started following you");
+        map.put("postId", "");
+        map.put("isPost", "no");
 
+        reference.push().setValue(map);
+    }
 }

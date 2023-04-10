@@ -143,6 +143,8 @@ public class ProfileFragment extends Fragment {
                     FirebaseDatabase.getInstance().getReference().child("Follow")
                             .child(profileId).child("followers")
                             .child(firebaseUser.getUid()).setValue(true);
+
+                    addNotifications();
                 } else if (btn.equals("FOLLOWING")) {
                     FirebaseDatabase.getInstance().getReference().child("Follow")
                             .child(firebaseUser.getUid()).child("following")
@@ -359,5 +361,15 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
+    private void addNotifications(){
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference("Notifications").child(profileId);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("userId", firebaseUser.getUid());
+        map.put("text", "started following you");
+        map.put("postId", "");
+        map.put("isPost", "no");
 
+        reference.push().setValue(map);
+    }
 }
