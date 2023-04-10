@@ -41,6 +41,9 @@
             android:value="@integer/google_play_services_version"
             android:exported="true"/>
         <activity
+            android:name=".EditProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".CommentActivity"
             android:exported="false" />
         <activity

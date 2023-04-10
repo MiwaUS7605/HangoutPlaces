@@ -98,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
                             selectedFragment = new MapsFrag();
                             break;
                         case R.id.nav_heart:
-                            //selectedFragment = new NotificationFragment();
-                            selectedFragment = new ChatsFragment();
+                            selectedFragment = new NotificationFragment();
+                            //selectedFragment = new ChatsFragment();
                             break;
                         case R.id.nav_profile:
                             SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
