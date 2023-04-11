@@ -1,5 +1,7 @@
 package com.groupb.locationsharing;
 
+import static com.google.firebase.messaging.Constants.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -8,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -213,7 +216,7 @@ public class MessageActivity extends AppCompatActivity {
                             , R.mipmap.ic_launcher
                             , username + ": " + msg
                             , "You have a new message"
-                            , userid);
+                            , receiver);
                     Sender sender = new Sender(data, token.getToken());
 
                     //Toast.makeText(getApplicationContext(), sender.data.toString() + "\n" + sender.to, Toast.LENGTH_SHORT).show();

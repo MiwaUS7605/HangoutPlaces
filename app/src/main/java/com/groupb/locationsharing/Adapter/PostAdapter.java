@@ -162,7 +162,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     FirebaseDatabase.getInstance().getReference().child("Likes").child(post.getPostId())
                             .child(firebaseUser.getUid()).setValue(true);
                     addNotifications(post.getPublisher(), post.getPostId());
-
+                    notify = true;
                     final String msg = "Some one liked your post";
 
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
@@ -334,12 +334,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     Token token = snapshot.getValue(Token.class);
                     Data data = new Data(firebaseUser.getUid()
                             , R.mipmap.ic_launcher
-                            , username + ": " + msg
+                            , username + " liked your post "
                             , "Someone interact with your post"
-                            , firebaseUser.getUid());
+                            , receiver);
                     Sender sender = new Sender(data, token.getToken());
 
-                    Toast.makeText(mContext, token.getToken(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext, token.getToken(), Toast.LENGTH_SHORT).show();
 
                     apiService.sendNotifications(sender).enqueue(new Callback<MyResponse>() {
                         @Override
@@ -353,7 +353,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                         @Override
                         public void onFailure(Call<MyResponse> call, Throwable t) {
-
+                            Toast.makeText(mContext, "Failed on send Notifications!", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
