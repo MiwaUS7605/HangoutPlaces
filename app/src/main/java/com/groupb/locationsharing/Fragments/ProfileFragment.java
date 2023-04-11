@@ -51,6 +51,7 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.groupb.locationsharing.Adapter.PhotoAdapter;
 import com.groupb.locationsharing.AddPostActivity;
+import com.groupb.locationsharing.EditProfileActivity;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
@@ -133,7 +134,7 @@ public class ProfileFragment extends Fragment {
                 String btn = edit_profile.getText().toString();
 
                 if (btn.equals("Edit your profile")) {
-                    // TODO: Go to EditProfile
+                    startActivity(new Intent(getContext(), EditProfileActivity.class));
                 } else if (btn.equals("FOLLOW")) {
                     FirebaseDatabase.getInstance().getReference().child("Follow")
                             .child(firebaseUser.getUid()).child("following")
@@ -142,6 +143,8 @@ public class ProfileFragment extends Fragment {
                     FirebaseDatabase.getInstance().getReference().child("Follow")
                             .child(profileId).child("followers")
                             .child(firebaseUser.getUid()).setValue(true);
+
+                    addNotifications();
                 } else if (btn.equals("FOLLOWING")) {
                     FirebaseDatabase.getInstance().getReference().child("Follow")
                             .child(firebaseUser.getUid()).child("following")
@@ -358,5 +361,15 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
+    private void addNotifications(){
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference("Notifications").child(profileId);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("userId", firebaseUser.getUid());
+        map.put("text", "started following you");
+        map.put("postId", "");
+        map.put("isPost", "no");
 
+        reference.push().setValue(map);
+    }
 }
