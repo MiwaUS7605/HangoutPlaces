@@ -20,10 +20,14 @@
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\Admin\.android\avd\Pixel_6_Pro_API_UpsideDownCake.avd" />
+            <value value="C:\Users\LENOVO\.android\avd\Pixel_2_API_28_2.avd" />
           </Key>
         </deviceKey>
       </Target>
+<<<<<<< HEAD
+    </targetSelectedWithDropDown>
+    <timeTargetWasSelectedWithDropDown value="2023-04-11T07:02:26.947336300Z" />
+=======
       <Target>
         <type value="RUNNING_DEVICE_TARGET" />
         <deviceKey>
@@ -34,6 +38,7 @@
         </deviceKey>
       </Target>
     </runningDeviceTargetsSelectedWithDialog>
+>>>>>>> d1ce357bd11f49e83ceb3d9aa58961be9e7e89a5
     <targetsSelectedWithDialog>
       <Target>
         <type value="QUICK_BOOT_TARGET" />

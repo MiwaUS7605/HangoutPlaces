@@ -1,5 +1,6 @@
 package com.groupb.locationsharing.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,8 +22,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.groupb.locationsharing.Adapter.PostAdapter;
+import com.groupb.locationsharing.MainActivity;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.R;
+import com.groupb.locationsharing.StartActivity;
+import com.groupb.locationsharing.TranslateActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +38,8 @@ public class NewsFeedFragment extends Fragment {
     private List<Post> postList;
     private List<String> followingList;
     private ImageView nav_chat;
+
+    private FloatingActionButton fab;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,6 +60,14 @@ public class NewsFeedFragment extends Fragment {
             public void onClick(View view) {
                 ((FragmentActivity)getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new ChatsFragment()).commit();
+            }
+        });
+        fab=view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), TranslateActivity.class);
+                startActivity(intent);
             }
         });
         return view;
