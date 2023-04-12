@@ -171,7 +171,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             User user = dataSnapshot.getValue(User.class);
                             if (notify) {
-                                sendNotifications(post.getPublisher(), user.getUsername(), msg);
+                                sendNotifications(post.getPublisher(), user.getUsername(), msg, position);
                             }
                             notify = false;
                         }
@@ -324,7 +324,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         reference.push().setValue(map);
     }
 
-    private void sendNotifications(String receiver, final String username, final String msg) {
+    private void sendNotifications(String receiver, final String username, final String msg, int i) {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
         Query query = tokens.orderByKey().equalTo(receiver);
         query.addValueEventListener(new ValueEventListener() {
@@ -335,7 +335,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     Data data = new Data(firebaseUser.getUid()
                             , R.mipmap.ic_launcher
                             , username + " liked your post "
-                            , "Someone interact with your post"
+                            , "Someone interact with your post," + mPost.get(i).getPostId()
                             , receiver);
                     Sender sender = new Sender(data, token.getToken());
 

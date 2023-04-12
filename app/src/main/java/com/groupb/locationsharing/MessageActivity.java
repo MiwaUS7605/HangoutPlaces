@@ -92,6 +92,7 @@ public class MessageActivity extends AppCompatActivity {
         username = findViewById(R.id.username);
         sendBtn = findViewById(R.id.btnSend);
         textSend = findViewById(R.id.textSend);
+
         intent = getIntent();
         userid = intent.getStringExtra("userid");
 

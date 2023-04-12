@@ -221,7 +221,7 @@ public class CommentActivity extends AppCompatActivity {
                     Data data = new Data(firebaseUser.getUid()
                             , R.mipmap.ic_launcher
                             , username + " commented your post "
-                            , "Someone interact with your post"
+                            , "Someone interact with your post," + postId
                             , receiver);
                     Sender sender = new Sender(data, token.getToken());
 

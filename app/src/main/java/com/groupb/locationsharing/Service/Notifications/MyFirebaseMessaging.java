@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.groupb.locationsharing.MainActivity;
 import com.groupb.locationsharing.MessageActivity;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.Model.User;
@@ -77,25 +78,69 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
 
-        Intent intent = new Intent(this, MessageActivity.class);
-        Bundle bundle = new Bundle();
-        Log.e(TAG, user + "bbbbbbbbbbbbbbb");
-        bundle.putString("userid", user);
-        intent.putExtras(bundle);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_MUTABLE);
+        if (title.equals("You have a new message")) {
+            Intent intent = new Intent(this, MessageActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("userid", user);
+            intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_MUTABLE);
 
-        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        OreoNotification oreoNotification = new OreoNotification(this);
-        Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent, defaultSound, icon);
+            OreoNotification oreoNotification = new OreoNotification(this);
+            Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent, defaultSound, icon);
 
-        int i = 0;
-        if (j > 0) {
-            i = j;
+            int i = 0;
+            if (j > 0) {
+                i = j;
+            }
+
+            oreoNotification.getNotificationManager().notify(i, builder.build());
+        } else if(title.equals("Someone is following you")){
+            Intent intent = new Intent(this, MainActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("publisherId", user);
+            intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_MUTABLE);
+
+            Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            OreoNotification oreoNotification = new OreoNotification(this);
+            Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent, defaultSound, icon);
+
+            int i = 0;
+            if (j > 0) {
+                i = j;
+            }
+
+            oreoNotification.getNotificationManager().notify(i, builder.build());
+        } else {
+            String titlePostId[] = title.split(",");
+            Log.e(TAG, titlePostId[0]);
+            String realTitle = titlePostId[0];
+            String postId = titlePostId[1];
+
+            Intent intent = new Intent(this, MainActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("postId", postId);
+            intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_MUTABLE);
+
+            Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            OreoNotification oreoNotification = new OreoNotification(this);
+            Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent, defaultSound, icon);
+
+            int i = 0;
+            if (j > 0) {
+                i = j;
+            }
+
+            oreoNotification.getNotificationManager().notify(i, builder.build());
         }
-
-        oreoNotification.getNotificationManager().notify(i, builder.build());
     }
 
     private void sendNotifications(RemoteMessage message) {
@@ -133,7 +178,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         noti.notify(i, builder.build());
     }
-    private boolean checkIsPost(String id){
+
+    private boolean checkIsPost(String id) {
         DatabaseReference userReference = FirebaseDatabase.getInstance()
                 .getReference("Users").child(id);
         final User[] user = {new User()};
@@ -141,7 +187,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         userReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) result[0] = false;
+                if (snapshot.exists()) result[0] = false;
             }
 
             @Override
