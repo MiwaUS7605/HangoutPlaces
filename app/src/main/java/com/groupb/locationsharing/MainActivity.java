@@ -1,14 +1,18 @@
 package com.groupb.locationsharing;
 
+import static com.google.firebase.messaging.Constants.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -16,6 +20,7 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -36,6 +41,7 @@ import com.groupb.locationsharing.Fragments.ChatsFragment;
 import com.groupb.locationsharing.Fragments.MapsFrag;
 import com.groupb.locationsharing.Fragments.NewsFeedFragment;
 import com.groupb.locationsharing.Fragments.NotificationFragment;
+import com.groupb.locationsharing.Fragments.PostDetailFragment;
 import com.groupb.locationsharing.Fragments.ProfileFragment;
 import com.groupb.locationsharing.Fragments.SearchFragment;
 import com.groupb.locationsharing.Fragments.UsersFragment;
@@ -53,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
     Fragment selectedFragment = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,17 +71,28 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
         Bundle intent = getIntent().getExtras();
-        if( intent!= null){
-            String publisher = intent.getString("publisherId");
+        if (intent != null) {
 
-            SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
-            editor.putString("profileId", publisher);
-            editor.apply();
+            String publisher = getIntent().getStringExtra("publisherId");
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container
-                    , new ProfileFragment()).commit();
-        }
-        else {
+            String postId = getIntent().getStringExtra("postId");
+
+            if (postId != null) {
+                SharedPreferences.Editor editor = getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                editor.putString("postId", postId);
+                editor.apply();
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
+            } else {
+                SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
+                editor.putString("profileId", publisher);
+                editor.apply();
+
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container
+                        , new ProfileFragment()).commit();
+            }
+        } else {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container
                     , new NewsFeedFragment()).commit();
         }
@@ -85,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    switch (item.getItemId()){
+                    switch (item.getItemId()) {
                         case R.id.nav_home:
                             selectedFragment = new NewsFeedFragment();
                             break;
@@ -108,15 +126,15 @@ public class MainActivity extends AppCompatActivity {
                             selectedFragment = new ProfileFragment();
                             break;
                     }
-                    if (selectedFragment!=null){
+                    if (selectedFragment != null) {
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container
-                        , selectedFragment).commit();
+                                , selectedFragment).commit();
                     }
                     return true;
                 }
             };
 
-    private void status(String status){
+    private void status(String status) {
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
 
         HashMap<String, Object> hashMap = new HashMap<>();
