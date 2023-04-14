@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.groupb.locationsharing.Adapter.PostAdapter;
+import com.groupb.locationsharing.AddPostActivity;
 import com.groupb.locationsharing.MainActivity;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.R;
@@ -39,7 +40,8 @@ public class NewsFeedFragment extends Fragment {
     private List<String> followingList;
     private ImageView nav_chat;
 
-    private FloatingActionButton fab;
+    private FloatingActionButton fab, addPost;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -58,11 +60,11 @@ public class NewsFeedFragment extends Fragment {
         nav_chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((FragmentActivity)getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                ((FragmentActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new ChatsFragment()).commit();
             }
         });
-        fab=view.findViewById(R.id.fab);
+        fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,10 +72,17 @@ public class NewsFeedFragment extends Fragment {
                 startActivity(intent);
             }
         });
+        addPost = view.findViewById(R.id.addPost);
+        addPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), AddPostActivity.class));
+            }
+        });
         return view;
     }
 
-    private void checkFollowing(){
+    private void checkFollowing() {
         followingList = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("following");
@@ -82,7 +91,7 @@ public class NewsFeedFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 followingList.clear();
-                for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     followingList.add(snapshot.getKey());
                 }
                 readPosts();
@@ -95,18 +104,18 @@ public class NewsFeedFragment extends Fragment {
         });
     }
 
-    private void readPosts(){
+    private void readPosts() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 postList.clear();
-                for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Post post = snapshot.getValue(Post.class);
 
-                    for (String id: followingList){
-                        if(post.getPublisher().equals(id)){
+                    for (String id : followingList) {
+                        if (post.getPublisher().equals(id)) {
                             postList.add(post);
                         }
                     }

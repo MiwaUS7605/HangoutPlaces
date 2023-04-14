@@ -10,7 +10,9 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground">
+        android:background="?android:attr/windowBackground"
+        android:backgroundTint="@color/black"
+        app:titleTextColor="@color/white">
 
     </com.google.android.material.appbar.MaterialToolbar>
 
@@ -19,7 +21,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottom"
-        android:layout_below="@id/toolbar">
+        android:layout_below="@id/toolbar"
+        android:background="@drawable/custom_edittext">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -28,6 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@color/black"
         android:padding="4dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -45,7 +49,8 @@
             android:layout_marginEnd="10dp"
             android:layout_toLeftOf="@id/post_comment"
             android:layout_toRightOf="@id/profile_image"
-            android:hint="Type your comments"></EditText>
+            android:hint="Type your comments"
+            android:textColor="@color/white"></EditText>
 
         <TextView
             android:id="@+id/post_comment"
@@ -55,6 +60,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="5dp"
             android:text="POST"
+            android:textColor="@color/white"
             android:textStyle="bold">
 
         </TextView>
