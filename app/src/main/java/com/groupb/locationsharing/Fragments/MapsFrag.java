@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -65,6 +66,9 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
     Bitmap profileAvatar;
 
     BitmapDrawable bd;
+    StorageReference storageReference;
+    HashMap<String, Object> dataUpdate;
+    String city;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -72,6 +76,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         getUserInfor();
+        dataUpdate = new HashMap<>();
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         bd=(BitmapDrawable)getResources().getDrawable(R.drawable.test);
@@ -151,11 +156,12 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
 // Create a new Bitmap object from the saved image file
         profileAvatar = BitmapFactory.decodeFile(file.getAbsolutePath());
     }
-    public void getCity(Double latitude, Double longitude) throws IOException {
+    public String getCity(Double latitude, Double longitude) throws IOException {
         Geocoder geoCoder = new Geocoder(getContext(), Locale.getDefault());
         List<Address> matches = geoCoder.getFromLocation(latitude, longitude, 1);
         Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
         Toast.makeText(getContext(), bestMatch.getAdminArea(), Toast.LENGTH_SHORT).show();
+        return bestMatch.getAdminArea();
     }
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -184,10 +190,20 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 try {
-                    getCity(latitude, longitude);
+                    city = getCity(latitude, longitude);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+                String lng= String.valueOf(longitude);
+                String lat= String.valueOf(latitude);
+                //Update location on firebase
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+                firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                storageReference = FirebaseStorage.getInstance().getReference("uploads");
+                dataUpdate.put("lat", lat);
+                dataUpdate.put("lon", lng);
+                dataUpdate.put("city", city);
+                reference.updateChildren(dataUpdate);
                 LatLng latLng = new LatLng(latitude, longitude);
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
