@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -51,6 +53,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Locale;
 
 public class MapsFrag extends Fragment implements OnMapReadyCallback {
     GoogleMap mMap;
@@ -147,6 +151,12 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
 // Create a new Bitmap object from the saved image file
         profileAvatar = BitmapFactory.decodeFile(file.getAbsolutePath());
     }
+    public void getCity(Double latitude, Double longitude) throws IOException {
+        Geocoder geoCoder = new Geocoder(getContext(), Locale.getDefault());
+        List<Address> matches = geoCoder.getFromLocation(latitude, longitude, 1);
+        Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
+        Toast.makeText(getContext(), bestMatch.getAdminArea(), Toast.LENGTH_SHORT).show();
+    }
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -173,6 +183,11 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 // Handle the new location
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
+                try {
+                    getCity(latitude, longitude);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 LatLng latLng = new LatLng(latitude, longitude);
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
