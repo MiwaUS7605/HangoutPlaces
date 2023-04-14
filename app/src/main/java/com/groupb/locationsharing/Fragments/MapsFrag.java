@@ -23,6 +23,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -43,6 +45,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.groupb.locationsharing.Adapter.SearchUserAdapter;
+import com.groupb.locationsharing.Adapter.ViewUserOnMapAdapter;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
 
@@ -53,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -69,10 +74,21 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
     StorageReference storageReference;
     HashMap<String, Object> dataUpdate;
     String city;
+
+    List<User> mUsers;
+    ViewUserOnMapAdapter viewUserOnMapAdapter;
+    RecyclerView recyclerView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.layout_map, container, false);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        viewUserOnMapAdapter = new ViewUserOnMapAdapter(getContext(), mUsers);
+        recyclerView.setAdapter(viewUserOnMapAdapter);
+
+        mUsers = new ArrayList<>();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         getUserInfor();
@@ -102,13 +118,13 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 String imgSTR = user.getImageUrl();
 
                 if (user.getImageUrl().equals("default")) {
-                    Toast.makeText(getContext(), "No image", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "No image", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "Get image from server: "+imgSTR, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "Get image from server: "+imgSTR, Toast.LENGTH_SHORT).show();
                     try {
                         downloadImage(imgSTR);
                     } catch (IOException e) {
-                        Toast.makeText(getContext(), "Error when download image: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "Error when download image: "+e.getMessage(), Toast.LENGTH_SHORT).show();
                         throw new RuntimeException(e);
                     }
                     getImageFromStorage();
@@ -160,8 +176,32 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         Geocoder geoCoder = new Geocoder(getContext(), Locale.getDefault());
         List<Address> matches = geoCoder.getFromLocation(latitude, longitude, 1);
         Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
-        Toast.makeText(getContext(), bestMatch.getAdminArea(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), bestMatch.getAdminArea(), Toast.LENGTH_SHORT).show();
         return bestMatch.getAdminArea();
+    }
+    public void getPeopleSameCity(String city){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                mUsers.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    User user = snapshot1.getValue(User.class);
+                    Toast.makeText(getContext(), user.getCity(), Toast.LENGTH_SHORT).show();
+                    if (user.getCity().equals(city)) {
+                        mUsers.add(user);
+                    }
+                }
+                //Load people
+                viewUserOnMapAdapter = new ViewUserOnMapAdapter(getContext(), mUsers);
+                recyclerView.setAdapter(viewUserOnMapAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
     }
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -194,6 +234,8 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+                getPeopleSameCity(city);
+                //Toast.makeText(getContext(), String.valueOf(mUsers.isEmpty()), Toast.LENGTH_SHORT).show();
                 String lng= String.valueOf(longitude);
                 String lat= String.valueOf(latitude);
                 //Update location on firebase
