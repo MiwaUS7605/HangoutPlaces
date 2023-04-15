@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +40,7 @@ public class NewsFeedFragment extends Fragment {
     private List<Post> postList;
     private List<String> followingList;
     private ImageView nav_chat;
-
+    private ProgressBar progressBar;
     private FloatingActionButton fab, addPost;
 
     @Override
@@ -79,6 +80,8 @@ public class NewsFeedFragment extends Fragment {
                 startActivity(new Intent(getContext(), AddPostActivity.class));
             }
         });
+
+        progressBar = view.findViewById(R.id.progress_circular);
         return view;
     }
 
@@ -121,6 +124,7 @@ public class NewsFeedFragment extends Fragment {
                     }
                 }
                 postAdapter.notifyDataSetChanged();
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override

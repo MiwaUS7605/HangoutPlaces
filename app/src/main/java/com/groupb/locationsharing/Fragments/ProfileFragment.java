@@ -56,6 +56,7 @@ import com.groupb.locationsharing.EditProfileActivity;
 import com.groupb.locationsharing.MessageActivity;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.Model.User;
+import com.groupb.locationsharing.OptionsActivity;
 import com.groupb.locationsharing.R;
 
 import java.util.ArrayList;
@@ -185,7 +186,13 @@ public class ProfileFragment extends Fragment {
                 }
             });
         }
-
+        options.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), OptionsActivity.class);
+                startActivity(intent);
+            }
+        });
         return view;
     }
 

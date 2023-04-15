@@ -8,8 +8,12 @@ public class User {
     private String username;
     private String status;
     private String bio;
+    private String findable;
+    private String lat;
+    private String lon;
+    private String city;
 
-    public User(String fullname, String id, String imageUrl, String name, String username, String status, String bio) {
+    public User(String fullname, String id, String imageUrl, String name, String username, String status, String bio, String findable, String lat, String lon, String city) {
         this.fullname = fullname;
         this.id = id;
         this.imageUrl = imageUrl;
@@ -17,6 +21,10 @@ public class User {
         this.username = username;
         this.status = status;
         this.bio = bio;
+        this.findable = findable;
+        this.lat = lat;
+        this.lon = lon;
+        this.city = city;
     }
 
     public User() {
@@ -76,5 +84,37 @@ public class User {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public String getFindable() {
+        return findable;
+    }
+
+    public void setFindable(String findable) {
+        this.findable = findable;
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public String getLon() {
+        return lon;
+    }
+
+    public void setLon(String lon) {
+        this.lon = lon;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

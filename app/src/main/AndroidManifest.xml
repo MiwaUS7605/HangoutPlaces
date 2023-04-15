@@ -21,7 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
-
+        <activity
+            android:name=".OptionsActivity"
+            android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -38,9 +40,12 @@
             android:value="AIzaSyBJJ1MkOsY8sTRUtZNjM9a-IuAP3WVvLrI" />
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"
-            android:exported="true"/>
-        <activity android:name=".TranslateActivity" android:exported="false"/>
+            android:exported="true"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".TranslateActivity"
+            android:exported="false" />
         <activity
             android:name=".EditProfileActivity"
             android:exported="false" />

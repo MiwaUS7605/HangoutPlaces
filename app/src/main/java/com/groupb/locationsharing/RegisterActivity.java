@@ -142,6 +142,7 @@ public class RegisterActivity extends AppCompatActivity {
                             hashMap.put("status", "offline");
                             hashMap.put("name", username.toLowerCase());
                             hashMap.put("bio", "");
+                            hashMap.put("findable", "1");
                             reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
