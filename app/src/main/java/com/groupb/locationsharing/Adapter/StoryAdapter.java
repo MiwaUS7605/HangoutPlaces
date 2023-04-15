@@ -1,6 +1,9 @@
 package com.groupb.locationsharing.Adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.groupb.locationsharing.AddStoryActivity;
 import com.groupb.locationsharing.Model.Story;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
@@ -60,7 +64,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (holder.getAdapterPosition() != 0) {
+                if (holder.getAdapterPosition() == 0) {
                     myStory(holder.addstoryTxt, holder.story_plus, true);
                 } else {
                     // TODO: go to story
@@ -136,7 +140,27 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
                     }
                 }
                 if (click) {
-                    //TODO: show alert dialog
+                    if (count > 0) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "View story", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // TODO: go to story
+                            }
+                        });
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Add Story", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent(mContext, AddStoryActivity.class);
+                                mContext.startActivity(intent);
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        alertDialog.show();
+                    } else {
+                        Intent intent = new Intent(mContext, AddStoryActivity.class);
+                        mContext.startActivity(intent);
+                    }
                 } else {
                     if (count > 0) {
                         textView.setText("My Story");

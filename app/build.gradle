@@ -68,10 +68,15 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'androidx.work:work-runtime:2.8.1'
     implementation 'com.squareup.picasso:picasso:2.8'
-    //implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
 
     implementation 'com.github.shts:StoriesProgressView:3.0.0'
+
+    //implementation 'com.github.ArthurHub:Android-Image-Cropper:2.3.1'
+
+    //implementation ('com.github.CanHub:Android-Image-Cropper:4.5.0')
+    //implementation("com.vanniktech:android-image-cropper:4.5.0")
+    implementation 'com.github.bfrachia:android-image-cropper:2.7.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
