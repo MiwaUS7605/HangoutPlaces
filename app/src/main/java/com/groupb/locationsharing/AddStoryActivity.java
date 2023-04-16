@@ -1,5 +1,7 @@
 package com.groupb.locationsharing;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +12,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -45,9 +48,10 @@ public class AddStoryActivity extends AppCompatActivity {
 
         storageReference = FirebaseStorage.getInstance().getReference("story");
 
-        CropImage.activity()
-                .setAspectRatio(9, 16)
-                .start(AddStoryActivity.this);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+
+        startActivityForResult(intent, CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE);
     }
 
     private String getFileExtension(Uri uri) {
@@ -117,8 +121,15 @@ public class AddStoryActivity extends AppCompatActivity {
             mImageUri = result.getUri();
 
             publishStory();
-        }
-        else{
+        } else if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
+            mImageUri = data.getData(); // Get the selected image's Uri
+            // Start the CropImage activity with the selected image's Uri
+            CropImage.activity(mImageUri)
+                    .setAspectRatio(1, 1)
+                    .start(AddStoryActivity.this);
+
+            //imageView.setImageURI(imageUri);
+        } else {
             Toast.makeText(getApplicationContext(), "Something gone wrong", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(AddStoryActivity.this, MainActivity.class));
             finish();

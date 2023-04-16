@@ -53,6 +53,7 @@ import com.google.firebase.storage.UploadTask;
 import com.groupb.locationsharing.Adapter.PhotoAdapter;
 import com.groupb.locationsharing.AddPostActivity;
 import com.groupb.locationsharing.EditProfileActivity;
+import com.groupb.locationsharing.FollowersActivity;
 import com.groupb.locationsharing.MessageActivity;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.Model.User;
@@ -170,22 +171,24 @@ public class ProfileFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        if (profileId.equals(firebaseUser.getUid())) {
-            following.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ((FragmentActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                            new FollowingFragment()).commit();
-                }
-            });
-            followers.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ((FragmentActivity)getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                            new FollowerFragment()).commit();
-                }
-            });
-        }
+        following.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", profileId);
+                intent.putExtra("title", "following");
+                startActivity(intent);
+            }
+        });
+        followers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", profileId);
+                intent.putExtra("title", "followers");
+                startActivity(intent);
+            }
+        });
         options.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

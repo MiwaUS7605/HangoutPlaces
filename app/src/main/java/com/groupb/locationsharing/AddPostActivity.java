@@ -1,5 +1,7 @@
 package com.groupb.locationsharing;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +12,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -45,7 +48,6 @@ public class AddPostActivity extends AppCompatActivity {
     ImageView close, imageView;
     TextView post;
     EditText description;
-    Button browseBtn;
     private static final int IMAGE_REQUEST = 1;
 
     @Override
@@ -57,7 +59,6 @@ public class AddPostActivity extends AppCompatActivity {
         imageView = findViewById(R.id.added_image);
         post = findViewById(R.id.post);
         description = findViewById(R.id.description);
-        browseBtn = findViewById(R.id.browseBtn);
 
         storageReference = FirebaseStorage.getInstance().getReference("posts");
 
@@ -69,13 +70,6 @@ public class AddPostActivity extends AppCompatActivity {
             }
         });
 
-        browseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openImage();
-            }
-        });
-
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,17 +77,11 @@ public class AddPostActivity extends AppCompatActivity {
             }
         });
 
-        CropImage.activity()
-                .setAspectRatio(1, 1)
-                .start(AddPostActivity.this);
-
-    }
-
-    private void openImage() {
-        Intent intent = new Intent();
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, IMAGE_REQUEST);
+
+        startActivityForResult(intent, CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE);
+
     }
 
     private String getFileExtension(Uri uri) {
@@ -165,14 +153,27 @@ public class AddPostActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK){
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
             imageUri = result.getUri();
             imageView.setImageURI(imageUri);
-        } else {
+        }
+        else if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
+            imageUri = data.getData(); // Get the selected image's Uri
+            Log.e(TAG, imageUri.toString());
+            // Start the CropImage activity with the selected image's Uri
+            CropImage.activity(imageUri)
+                    .setAspectRatio(1, 1)
+                    .start(AddPostActivity.this);
+
+            //imageView.setImageURI(imageUri);
+        }
+        else {
             Toast.makeText(getApplicationContext(), "Something gone wrong", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(AddPostActivity.this, MainActivity.class));
             finish();
         }
     }
+
 }

@@ -24,6 +24,7 @@ import com.groupb.locationsharing.AddStoryActivity;
 import com.groupb.locationsharing.Model.Story;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
+import com.groupb.locationsharing.StoryActivity;
 
 import org.w3c.dom.Text;
 
@@ -67,7 +68,9 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
                 if (holder.getAdapterPosition() == 0) {
                     myStory(holder.addstoryTxt, holder.story_plus, true);
                 } else {
-                    // TODO: go to story
+                    Intent intent = new Intent(mContext, StoryActivity.class);
+                    intent.putExtra("userId", story.getUserId());
+                    mContext.startActivity(intent);
                 }
             }
         });
@@ -145,7 +148,10 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
                         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "View story", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                // TODO: go to story
+                                Intent intent = new Intent(mContext, StoryActivity.class);
+                                intent.putExtra("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                mContext.startActivity(intent);
+                                dialogInterface.dismiss();
                             }
                         });
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Add Story", new DialogInterface.OnClickListener() {

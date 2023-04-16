@@ -31,6 +31,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.groupb.locationsharing.CommentActivity;
+import com.groupb.locationsharing.FollowersActivity;
 import com.groupb.locationsharing.Fragments.APIService;
 import com.groupb.locationsharing.Fragments.PostDetailFragment;
 import com.groupb.locationsharing.Fragments.ProfileFragment;
@@ -192,6 +193,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 Intent intent = new Intent(mContext, CommentActivity.class);
                 intent.putExtra("postId", post.getPostId());
                 intent.putExtra("publisherId", post.getPublisher());
+                mContext.startActivity(intent);
+            }
+        });
+
+        holder.likes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, FollowersActivity.class);
+                intent.putExtra("id", post.getPostId());
+                intent.putExtra("title", "likes");
                 mContext.startActivity(intent);
             }
         });

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.FollowerFragment">
+    android:background="@color/black"
+    tools:context=".FollowersActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/bar"
@@ -20,13 +22,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <ImageView
+                    android:id="@+id/finish"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Followers"
+                    android:src="@drawable/ico_back">
+
+                </ImageView>
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_toRightOf="@id/finish"
+                    android:textColor="@color/white"
                     android:textSize="18dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/white">
+                    android:textStyle="bold">
 
                 </TextView>
             </RelativeLayout>
@@ -37,8 +49,6 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bar">
-
-    </androidx.recyclerview.widget.RecyclerView>
+        android:layout_below="@id/bar" />
 
 </RelativeLayout>
