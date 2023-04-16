@@ -125,7 +125,7 @@ public class AddStoryActivity extends AppCompatActivity {
             mImageUri = data.getData(); // Get the selected image's Uri
             // Start the CropImage activity with the selected image's Uri
             CropImage.activity(mImageUri)
-                    .setAspectRatio(1, 1)
+                    .setAspectRatio(9, 16)
                     .start(AddStoryActivity.this);
 
             //imageView.setImageURI(imageUri);

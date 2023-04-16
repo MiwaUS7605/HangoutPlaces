@@ -46,18 +46,6 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/browseBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="10dp"
-            android:background="@drawable/background_button"
-            android:text="Browse image"
-            android:textSize="20dp"
-            android:textStyle="bold" />
-
         <ImageView
             android:id="@+id/added_image"
             android:layout_width="match_parent"

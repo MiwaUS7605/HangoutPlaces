@@ -42,7 +42,7 @@ public class OptionsActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(OptionsActivity.this, StartActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-
+                finish();
             }
         });
         findableSwitch.setOnClickListener(new View.OnClickListener() {

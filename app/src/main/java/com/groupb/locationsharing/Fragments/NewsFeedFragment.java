@@ -157,14 +157,14 @@ public class NewsFeedFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 long timecurrent = System.currentTimeMillis();
                 storyList.clear();
-                storyList.add(new Story("default", 0, 0, ""
+                storyList.add(new Story("", 0, 0, ""
                         , FirebaseAuth.getInstance().getCurrentUser().getUid()));
                 for (String id : followingList) {
                     int countStory = 0;
                     Story story = null;
                     for (DataSnapshot snapshot : dataSnapshot.child(id).getChildren()) {
                         story = snapshot.getValue(Story.class);
-                        if (timecurrent > story.getTimeStart() && timecurrent > story.getTimeEnd()) {
+                        if (timecurrent > story.getTimeStart() && timecurrent < story.getTimeEnd()) {
                             countStory++;
                         }
                     }
