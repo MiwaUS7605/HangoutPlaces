@@ -3,6 +3,8 @@ package com.groupb.locationsharing.Fragments;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -23,10 +25,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,8 +36,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -45,13 +45,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.groupb.locationsharing.Adapter.SearchUserAdapter;
 import com.groupb.locationsharing.Adapter.ViewUserOnMapAdapter;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,16 +75,61 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
 
     List<User> mUsers;
     ViewUserOnMapAdapter viewUserOnMapAdapter;
+
+    static List<List<Double>> saveLocationForReload;
+    private static LocalBroadcastManager localBroadcastManager;
+    public static LocalBroadcastManager getLocalBroadcastManager(Context context) {
+        if (localBroadcastManager == null) {
+            localBroadcastManager = LocalBroadcastManager.getInstance(context.getApplicationContext());
+        }
+        return localBroadcastManager;
+    }
     RecyclerView recyclerView;
+    BroadcastReceiver locationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get the updated camera center data from the intent
+            double lat = Double.parseDouble(intent.getStringExtra("latitude"));
+            double lng = Double.parseDouble(intent.getStringExtra("longitude"));
+            List<Double> location = new ArrayList<>();
+            location.add(lat);
+            location.add(lng);
+            saveLocationForReload.add(location);
+            //Toast.makeText(context,intent.getStringExtra(lat), Toast.LENGTH_SHORT).show();
+            String name= intent.getStringExtra("name");
+            // Update the camera position on the map
+            LatLng newCameraCenter = new LatLng(lat, lng);
+            mMap.addMarker(new MarkerOptions().position(newCameraCenter).title(name));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraCenter));
+        }
+    };
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Register the BroadcastReceiver with the correct action string
+        LocalBroadcastManager localBroadcastManager = getLocalBroadcastManager(getContext());
+        localBroadcastManager.registerReceiver(locationReceiver, new IntentFilter("com.example.ACTION_UPDATE_CAMERA_CENTER"));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // Unregister the BroadcastReceiver when the fragment is stopped
+        LocalBroadcastManager localBroadcastManager = getLocalBroadcastManager(getContext());
+        localBroadcastManager.unregisterReceiver(locationReceiver);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if(saveLocationForReload== null){
+            saveLocationForReload = new ArrayList<>();
+        }
         View view = inflater.inflate(R.layout.layout_map, container, false);
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        viewUserOnMapAdapter = new ViewUserOnMapAdapter(getContext(), mUsers);
-        recyclerView.setAdapter(viewUserOnMapAdapter);
 
         mUsers = new ArrayList<>();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -97,8 +140,19 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
         bd=(BitmapDrawable)getResources().getDrawable(R.drawable.test);
         profileAvatar = bd.getBitmap();
+
+        viewUserOnMapAdapter = new ViewUserOnMapAdapter(getContext(), mUsers);
+        recyclerView.setAdapter(viewUserOnMapAdapter);
         return view;
     }
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//
+//        // Unregister the BroadcastReceiver
+//        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(locationReceiver);
+//    }
+
     private void getUserInfor() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -249,6 +303,12 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 LatLng latLng = new LatLng(latitude, longitude);
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+                if(saveLocationForReload.size()!=0){
+                    for(int i=0;i<saveLocationForReload.size();i++){
+                        LatLng newLatLng = new LatLng(saveLocationForReload.get(i).get(0), saveLocationForReload.get(i).get(1));
+                        mMap.addMarker(new MarkerOptions().position(newLatLng).title("Marker"));
+                    }
+                }
             }
 
             @Override
@@ -263,6 +323,5 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
             public void onProviderDisabled(String provider) {
             }
         }, null);
-
     }
 }
