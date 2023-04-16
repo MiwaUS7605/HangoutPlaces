@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.NotificationFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -13,7 +14,8 @@
 
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/black">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -24,7 +26,8 @@
                     android:layout_height="wrap_content"
                     android:text="Notifications"
                     android:textSize="18dp"
-                    android:textStyle="bold">
+                    android:textStyle="bold"
+                    android:textColor="@color/white">
 
                 </TextView>
             </RelativeLayout>

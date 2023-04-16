@@ -16,6 +16,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,8 +53,11 @@ import com.google.firebase.storage.UploadTask;
 import com.groupb.locationsharing.Adapter.PhotoAdapter;
 import com.groupb.locationsharing.AddPostActivity;
 import com.groupb.locationsharing.EditProfileActivity;
+import com.groupb.locationsharing.FollowersActivity;
+import com.groupb.locationsharing.MessageActivity;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.Model.User;
+import com.groupb.locationsharing.OptionsActivity;
 import com.groupb.locationsharing.R;
 
 import java.util.ArrayList;
@@ -67,7 +71,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ProfileFragment extends Fragment {
     ImageView profile_image, options;
     TextView posts, followers, following, fullname, bio, username;
-    Button edit_profile;
+    TextView edit_profile, chat;
     FirebaseUser firebaseUser;
     String profileId;
 
@@ -91,6 +95,7 @@ public class ProfileFragment extends Fragment {
 
         profileId = prefs.getString("profileId", "none");
 
+
         profile_image = view.findViewById(R.id.profile_image);
         options = view.findViewById(R.id.options);
         posts = view.findViewById(R.id.posts);
@@ -100,6 +105,7 @@ public class ProfileFragment extends Fragment {
         bio = view.findViewById(R.id.bio);
         username = view.findViewById(R.id.username);
         edit_profile = view.findViewById(R.id.edit_profile);
+        chat = view.findViewById(R.id.chat);
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -115,7 +121,7 @@ public class ProfileFragment extends Fragment {
 
         storageReference = FirebaseStorage.getInstance().getReference("uploads");
 
-        if (profileId.equals(firebaseUser.getUid())){
+        if (profileId.equals(firebaseUser.getUid())) {
             edit_profile.setText("Edit your profile");
             profile_image.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -124,8 +130,7 @@ public class ProfileFragment extends Fragment {
                 }
             });
 
-        }
-        else {
+        } else {
             checkFollow();
         }
         edit_profile.setOnClickListener(new View.OnClickListener() {
@@ -158,6 +163,39 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        chat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), MessageActivity.class);
+                intent.putExtra("userid", profileId);
+                startActivity(intent);
+            }
+        });
+        following.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", profileId);
+                intent.putExtra("title", "following");
+                startActivity(intent);
+            }
+        });
+        followers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", profileId);
+                intent.putExtra("title", "followers");
+                startActivity(intent);
+            }
+        });
+        options.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), OptionsActivity.class);
+                startActivity(intent);
+            }
+        });
         return view;
     }
 
@@ -207,6 +245,12 @@ public class ProfileFragment extends Fragment {
 
             }
         });
+
+        if (firebaseUser.getUid() != profileId) {
+            chat.setVisibility(View.VISIBLE);
+        } else {
+            chat.setVisibility(View.GONE);
+        }
     }
 
     private void getNumber() {
@@ -260,15 +304,16 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
-    private void myPhotos(){
+
+    private void myPhotos() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 postList.clear();
-                for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Post post = snapshot.getValue(Post.class);
-                    if(post.getPublisher().equals(profileId)){
+                    if (post.getPublisher().equals(profileId)) {
                         postList.add(post);
                     }
                     Collections.reverse(postList);
@@ -282,6 +327,7 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
+
     private void openImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -353,15 +399,15 @@ public class ProfileFragment extends Fragment {
         if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             imageUri = data.getData();
-            if(uploadTask!=null&&uploadTask.isInProgress()){
+            if (uploadTask != null && uploadTask.isInProgress()) {
                 Toast.makeText(getContext(), "Upload in progress", Toast.LENGTH_SHORT).show();
-            }
-            else{
+            } else {
                 uploadImage();
             }
         }
     }
-    private void addNotifications(){
+
+    private void addNotifications() {
         DatabaseReference reference = FirebaseDatabase.getInstance()
                 .getReference("Notifications").child(profileId);
         HashMap<String, Object> map = new HashMap<>();

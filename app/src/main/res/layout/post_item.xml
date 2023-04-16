@@ -29,12 +29,12 @@
                 android:layout_gravity="center_vertical"
                 android:textColor="@color/white"
                 android:textSize="16dp"
-                android:textStyle="bold"></TextView>
+                android:textStyle="bold" />
         </LinearLayout>
 
         <ImageView
             android:id="@+id/post_image"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/top"
             android:layout_marginTop="20dp"
@@ -44,9 +44,9 @@
 
         <RelativeLayout
             android:id="@+id/body"
-            android:layout_below="@id/post_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/post_image"
             android:padding="8dp">
 
             <ImageView
@@ -86,10 +86,10 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_below="@+id/body"
+            android:id="@id/bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@id/bottom">
+            android:layout_below="@+id/body">
 
             <TextView
                 android:id="@+id/publisher"
@@ -111,11 +111,11 @@
             android:id="@+id/viewComments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/bottom"
             android:layout_marginLeft="10dp"
             android:text="View all comments"
             android:textColor="#C1C0C0"
-            android:textStyle="italic"
-            android:layout_below="@+id/bottom">
+            android:textStyle="italic">
 
         </TextView>
     </RelativeLayout>

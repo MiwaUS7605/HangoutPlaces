@@ -142,6 +142,7 @@ public class RegisterActivity extends AppCompatActivity {
                             hashMap.put("status", "offline");
                             hashMap.put("name", username.toLowerCase());
                             hashMap.put("bio", "");
+                            hashMap.put("findable", "1");
                             hashMap.put("lon", "0");
                             hashMap.put("lat", "0");
                             hashMap.put("city", "unknown");

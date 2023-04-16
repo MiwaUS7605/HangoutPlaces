@@ -252,5 +252,6 @@
     <color name="md_orange_100">#FFE0B2</color>
     <color name="md_orange_200">#FFCC80</color>
     <color name="md_orange_300">#FFB74D</color>
+    <color name="fallback_border_color">#FF0000</color>
 
 </resources>

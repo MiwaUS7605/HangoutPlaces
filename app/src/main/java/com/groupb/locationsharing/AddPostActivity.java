@@ -1,5 +1,7 @@
 package com.groupb.locationsharing;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +11,8 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -30,6 +34,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.util.HashMap;
 
@@ -37,16 +42,14 @@ import java.util.HashMap;
 public class AddPostActivity extends AppCompatActivity {
 
     Uri imageUri;
+    String myUrl = "";
     StorageTask uploadTask;
     StorageReference storageReference;
-    DatabaseReference databaseReference;
-    FirebaseUser firebaseUser;
     ImageView close, imageView;
     TextView post;
     EditText description;
-    Button browseBtn;
-    HashMap<String, Object> map;
     private static final int IMAGE_REQUEST = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,11 +59,8 @@ public class AddPostActivity extends AppCompatActivity {
         imageView = findViewById(R.id.added_image);
         post = findViewById(R.id.post);
         description = findViewById(R.id.description);
-        browseBtn = findViewById(R.id.browseBtn);
 
         storageReference = FirebaseStorage.getInstance().getReference("posts");
-
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,37 +70,18 @@ public class AddPostActivity extends AppCompatActivity {
             }
         });
 
-        browseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openImage();
-            }
-        });
-
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (imageUri == null) {
-                    Toast.makeText(getApplicationContext(), "No image selected", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String postId = databaseReference.push().getKey();
-                map.put("postId", postId);
-                map.put("postDescription", description.getText().toString());
-                databaseReference.child(postId).setValue(map);
-
-                startActivity(new Intent(AddPostActivity.this, MainActivity.class));
-                finish();
-                Toast.makeText(getApplicationContext(), "SUCCESSFUL", Toast.LENGTH_SHORT);
+                uploadImage();
             }
         });
-    }
 
-    private void openImage() {
-        Intent intent = new Intent();
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, IMAGE_REQUEST);
+
+        startActivityForResult(intent, CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE);
+
     }
 
     private String getFileExtension(Uri uri) {
@@ -109,13 +90,13 @@ public class AddPostActivity extends AppCompatActivity {
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
-    private void uploadImage(){
+    private void uploadImage() {
         final ProgressDialog pd = new ProgressDialog(this);
-        pd.setMessage("Uploading");
+        pd.setMessage("Posting");
         pd.show();
 
         if (imageUri != null) {
-            final StorageReference reference = storageReference.child(System.currentTimeMillis()
+            StorageReference reference = storageReference.child(System.currentTimeMillis()
                     + "." + getFileExtension(imageUri));
             uploadTask = reference.putFile(imageUri);
             uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -134,16 +115,24 @@ public class AddPostActivity extends AppCompatActivity {
                         Uri downloadUri = task.getResult();
                         String mUri = downloadUri.toString();
 
-                        databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
 
                         String postId = databaseReference.push().getKey();
-                        map = new HashMap<>();
+
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("postId", postId);
                         map.put("postImage", mUri);
-                        map.put("publisher", firebaseUser.getUid());
+                        map.put("postDescription", description.getText().toString());
+                        map.put("publisher", FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                        databaseReference.child(postId).setValue(map);
 
                         pd.dismiss();
 
-                        Glide.with(getApplicationContext()).load(mUri).into(imageView);
+                        //Glide.with(getApplicationContext()).load(mUri).into(imageView);
+
+                        startActivity(new Intent(AddPostActivity.this, MainActivity.class));
+                        finish();
                     } else {
                         Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
                         pd.dismiss();
@@ -164,16 +153,27 @@ public class AddPostActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK){
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
-        if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            if(uploadTask!=null&&uploadTask.isInProgress()){
-                Toast.makeText(getApplicationContext(), "Upload in progress", Toast.LENGTH_SHORT).show();
-            }
-            else{
-                uploadImage();
-            }
+            imageUri = result.getUri();
+            imageView.setImageURI(imageUri);
+        }
+        else if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
+            imageUri = data.getData(); // Get the selected image's Uri
+            Log.e(TAG, imageUri.toString());
+            // Start the CropImage activity with the selected image's Uri
+            CropImage.activity(imageUri)
+                    .setAspectRatio(1, 1)
+                    .start(AddPostActivity.this);
+
+            //imageView.setImageURI(imageUri);
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Something gone wrong", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(AddPostActivity.this, MainActivity.class));
+            finish();
         }
     }
+
 }

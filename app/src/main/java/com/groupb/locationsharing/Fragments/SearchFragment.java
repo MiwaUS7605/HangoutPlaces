@@ -1,5 +1,7 @@
 package com.groupb.locationsharing.Fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,7 +78,7 @@ public class SearchFragment extends Fragment {
         return view;
     }
 
-    private void searchUsers(String s){
+    private void searchUsers(String s) {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         Query query = FirebaseDatabase.getInstance().getReference("Users")
                 .orderByChild("name").startAt(s).endAt(s + "\uf8ff");
@@ -87,9 +90,11 @@ public class SearchFragment extends Fragment {
                     User user = snapshot.getValue(User.class);
                     assert user != null;
                     assert firebaseUser != null;
-                    if (!user.getId().equals(firebaseUser.getUid())) {
-                        mUsers.add(user);
-                    }
+                    if (user.getId().equals(firebaseUser.getUid())) {
+                        continue;
+                    } else if (user.getFindable().equals("0")) {
+                        continue;
+                    } else mUsers.add(user);
                 }
                 searchUserAdapter = new SearchUserAdapter(getContext(), mUsers);
                 recyclerView.setAdapter(searchUserAdapter);
@@ -102,7 +107,7 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    private void readUsers(){
+    private void readUsers() {
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
 
@@ -116,9 +121,11 @@ public class SearchFragment extends Fragment {
 
                         assert user != null;
                         assert firebaseUser != null;
-                        if (!user.getId().equals(firebaseUser.getUid())) {
-                            mUsers.add(user);
-                        }
+                        if (user.getId().equals(firebaseUser.getUid())) {
+                            continue;
+                        } else if (user.getFindable().equals("0")) {
+                            continue;
+                        } else mUsers.add(user);
                     }
 
                     searchUserAdapter = new SearchUserAdapter(getContext(), mUsers);

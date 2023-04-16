@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.ProfileFragment"
-    android:background="@color/white">
+    android:background="@color/black"
+    tools:context=".Fragments.ProfileFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/bar"
@@ -15,7 +15,7 @@
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?android:attr/windowBackground">
+            android:background="@color/black">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -26,6 +26,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
+                    android:textColor="@color/white"
                     android:textSize="18dp"
                     android:textStyle="bold"></TextView>
 
@@ -90,13 +91,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
+                                android:textColor="@color/white"
                                 android:textSize="18dp"
                                 android:textStyle="bold"></TextView>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="POSTS"></TextView>
+                                android:text="POSTS"
+                                android:textColor="@color/white"></TextView>
 
                         </LinearLayout>
 
@@ -111,13 +114,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
+                                android:textColor="@color/white"
                                 android:textSize="18dp"
                                 android:textStyle="bold"></TextView>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="FOLLOWERS"></TextView>
+                                android:text="FOLLOWERS"
+                                android:textColor="@color/white"></TextView>
 
                         </LinearLayout>
 
@@ -132,24 +137,43 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
+                                android:textColor="@color/white"
                                 android:textSize="18dp"
                                 android:textStyle="bold"></TextView>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="FOLLOWING"></TextView>
+                                android:text="FOLLOWING"
+                                android:textColor="@color/white"></TextView>
 
                         </LinearLayout>
                     </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
+                    <TextView
                         android:id="@+id/edit_profile"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Edit your profile"></com.google.android.material.button.MaterialButton>
+                        android:background="@drawable/item_bg"
+                        android:gravity="center"
+                        android:text="Edit your profile"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"></TextView>
+
+                    <TextView
+                        android:id="@+id/chat"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/item_bg"
+                        android:gravity="center"
+                        android:text="Send message"
+                        android:textColor="@color/white"
+                        android:visibility="gone"></TextView>
+
                 </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
@@ -164,6 +188,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
+                    android:textColor="@color/white"
                     android:textSize="16dp"
                     android:textStyle="bold"></TextView>
 
@@ -172,7 +197,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:maxLines="5"></TextView>
+                    android:maxLines="5"
+                    android:textColor="@color/white"></TextView>
 
             </LinearLayout>
 

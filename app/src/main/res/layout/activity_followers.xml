@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.ChatsFragment">
+    android:background="@color/black"
+    tools:context=".FollowersActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/bar"
@@ -20,10 +22,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <ImageView
+                    android:id="@+id/finish"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chat"
+                    android:src="@drawable/ico_back">
+
+                </ImageView>
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_toRightOf="@id/finish"
                     android:textColor="@color/white"
                     android:textSize="18dp"
                     android:textStyle="bold">
@@ -31,37 +43,12 @@
                 </TextView>
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/black">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:src="@drawable/ic_search"></ImageView>
-
-            <EditText
-                android:id="@+id/search_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginLeft="20dp"
-                android:background="@color/black"
-                android:hint="Search"
-                android:maxLines="1"
-                android:textColor="@color/white"></EditText>
-        </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bar">
+        android:layout_below="@id/bar" />
 
-    </androidx.recyclerview.widget.RecyclerView>
 </RelativeLayout>
