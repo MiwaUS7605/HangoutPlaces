@@ -1,6 +1,8 @@
 package com.groupb.locationsharing.Adapter;
 
+import android.app.MediaRouteButton;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,9 +10,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -21,6 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.groupb.locationsharing.Fragments.MapsFrag;
 import com.groupb.locationsharing.Fragments.ProfileFragment;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
@@ -32,11 +37,14 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
     private Context mContext;
     private List<User> mUsers;
 
+    private LocalBroadcastManager localBroadcastManager;
+
     private FirebaseUser firebaseUser;
 
     public ViewUserOnMapAdapter(Context mContext, List<User> mUser) {
         this.mContext = mContext;
         this.mUsers = mUser;
+        localBroadcastManager = MapsFrag.getLocalBroadcastManager(mContext);
     }
 
     @NonNull
@@ -58,8 +66,6 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
 
         holder.fullname.setText(user.getFullname());
 
-        isFollowing(user.getId(), holder.followBtn);
-
         if (user.getImageUrl().equals("default")) {
             holder.profile_image.setImageResource(R.mipmap.ic_launcher);
         } else {
@@ -80,28 +86,17 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
                         new ProfileFragment()).commit();
             }
         });
-
+        
         holder.followBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(holder.followBtn.getText().toString().equals("Follow")){
-                    FirebaseDatabase.getInstance().getReference().child("Follow")
-                            .child(firebaseUser.getUid()).child("following")
-                            .child(user.getId()).setValue(true);
+                Intent intent = new Intent("com.example.ACTION_UPDATE_CAMERA_CENTER");
+                intent.putExtra("latitude", user.getLat());
+                intent.putExtra("longitude", user.getLon());
+                intent.putExtra("username", user.getUsername());
+                //Toast.makeText(mContext, user.getLat()+" "+user.getLon(), Toast.LENGTH_SHORT).show();
+                localBroadcastManager.sendBroadcast(intent);
 
-                    FirebaseDatabase.getInstance().getReference().child("Follow")
-                            .child(user.getId()).child("followers")
-                            .child(firebaseUser.getUid()).setValue(true);
-                    addNotifications(user.getId());
-                } else{
-                    FirebaseDatabase.getInstance().getReference().child("Follow")
-                            .child(firebaseUser.getUid()).child("following")
-                            .child(user.getId()).removeValue();
-
-                    FirebaseDatabase.getInstance().getReference().child("Follow")
-                            .child(user.getId()).child("followers")
-                            .child(firebaseUser.getUid()).removeValue();
-                }
             }
         });
     }
@@ -110,6 +105,7 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
         public TextView username, fullname;
         public Button followBtn;
         public ImageView profile_image;
+
         public ViewHolder(@NonNull View item){
             super(item);
             username = item.findViewById(R.id.username);
@@ -125,37 +121,5 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
         if(mUsers == null)
             return 0;
         return mUsers.size();
-    }
-
-    private void isFollowing(final String uid, final Button button){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Follow")
-                .child(firebaseUser.getUid()).child("following");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child(uid).exists()){
-                    button.setText("Following");
-                }
-                else{
-                    button.setText("Follow");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-    private void addNotifications(String userId){
-        DatabaseReference reference = FirebaseDatabase.getInstance()
-                .getReference("Notifications").child(userId);
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("userId", firebaseUser.getUid());
-        map.put("text", "started following you");
-        map.put("postId", "");
-        map.put("isPost", "no");
-
-        reference.push().setValue(map);
     }
 }
