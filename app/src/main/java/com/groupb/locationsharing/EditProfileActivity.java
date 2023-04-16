@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +33,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.groupb.locationsharing.Model.User;
-import com.rengwuxian.materialedittext.MaterialEditText;
+//import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.HashMap;
 
@@ -40,7 +41,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     ImageView close, profile_image;
     TextView save, tv_change;
-    MaterialEditText fullname, username, bio;
+    EditText fullname, username, bio;
     FirebaseUser firebaseUser;
     DatabaseReference databaseReference;
     private Uri imageUri;
