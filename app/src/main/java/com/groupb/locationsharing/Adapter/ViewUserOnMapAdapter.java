@@ -4,6 +4,7 @@ import android.app.MediaRouteButton;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,6 +91,7 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
         holder.followBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //holder.followBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.my_color)));
                 Intent intent = new Intent("com.example.ACTION_UPDATE_CAMERA_CENTER");
                 intent.putExtra("latitude", user.getLat());
                 intent.putExtra("longitude", user.getLon());
