@@ -1,9 +1,12 @@
 package com.groupb.locationsharing.Adapter;
 
+import static com.groupb.locationsharing.Fragments.MapsFrag.mainLocation;
+
 import android.app.MediaRouteButton;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +49,17 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
         this.mUsers = mUser;
         localBroadcastManager = MapsFrag.getLocalBroadcastManager(mContext);
     }
-
+    public static double distance(double lat1, double lon1, double lat2, double lon2) {
+        double R = 6371.0; // Earth's radius in km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double distance = R * c;
+        return distance;
+    }
     @NonNull
     @Override
     public ViewUserOnMapAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -57,14 +70,14 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
     @Override
     public void onBindViewHolder(@NonNull ViewUserOnMapAdapter.ViewHolder holder, int position) {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
         final User user = mUsers.get(position);
-
+        Double distanceCal= distance(Double.parseDouble(user.getLat()), Double.parseDouble(user.getLon()), mainLocation.get(0), mainLocation.get(1));
+        Double distanceToShow=Double.parseDouble(String.format("%.2f", distanceCal));
         holder.followBtn.setVisibility(View.VISIBLE);
 
         holder.username.setText(user.getUsername());
 
-        holder.fullname.setText(user.getFullname());
+        holder.fullname.setText(user.getFullname() +" - " + distanceToShow + " km");
 
         if (user.getImageUrl().equals("default")) {
             holder.profile_image.setImageResource(R.mipmap.ic_launcher);
@@ -74,6 +87,7 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
 
         if(user.getId().equals(firebaseUser.getUid())){
             holder.followBtn.setVisibility(View.GONE);
+            holder.username.setText(user.getUsername()+" (You)");
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -90,10 +104,12 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
         holder.followBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //holder.followBtn.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.my_color)));
                 Intent intent = new Intent("com.example.ACTION_UPDATE_CAMERA_CENTER");
                 intent.putExtra("latitude", user.getLat());
                 intent.putExtra("longitude", user.getLon());
                 intent.putExtra("username", user.getUsername());
+                intent.putExtra("urlImageSent", user.getImageUrl());
                 //Toast.makeText(mContext, user.getLat()+" "+user.getLon(), Toast.LENGTH_SHORT).show();
                 localBroadcastManager.sendBroadcast(intent);
 
