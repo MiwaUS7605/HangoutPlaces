@@ -72,6 +72,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -94,7 +95,9 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
     TextView bar;
     public static List<List<Double>> saveLocationForReload;
     public static List<String> saveNameForReload;
+    public static List<String> saveUsernameForReload;
     private static LocalBroadcastManager localBroadcastManager;
+    public static List<Double>mainLocation;
     public static LocalBroadcastManager getLocalBroadcastManager(Context context) {
         if (localBroadcastManager == null) {
             localBroadcastManager = LocalBroadcastManager.getInstance(context.getApplicationContext());
@@ -114,6 +117,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
             saveLocationForReload.add(location);
             //Toast.makeText(context,intent.getStringExtra(lat), Toast.LENGTH_SHORT).show();
             String name= intent.getStringExtra("name");
+            String username= intent.getStringExtra("username");
             String imgUrlForOther = intent.getStringExtra("urlImageSent");
             Bitmap newAvatar = BitmapFactory.decodeResource(getResources(), R.drawable.test);
             //If avatar is default, get default image then save it to internal storage and set name according to the index of saveNameForReload
@@ -162,10 +166,11 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                     throw new RuntimeException(e);
                 }
             }
+            saveUsernameForReload.add(username);
             Bitmap smallMarker = Bitmap.createScaledBitmap(newAvatar, 154, 154, false);
             // Update the camera position on the map
             LatLng newCameraCenter = new LatLng(lat, lng);
-            mMap.addMarker(new MarkerOptions().position(newCameraCenter).title(name).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+            mMap.addMarker(new MarkerOptions().position(newCameraCenter).title(name).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)).title(username));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraCenter));
         }
     };
@@ -214,6 +219,12 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         }
         if(saveNameForReload== null){
             saveNameForReload = new ArrayList<>();
+        }
+        if(mainLocation== null){
+            mainLocation = new ArrayList<Double>(Arrays.asList(0.0,0.0));
+        }
+        if(saveUsernameForReload== null){
+            saveUsernameForReload = new ArrayList<>();
         }
         View view = inflater.inflate(R.layout.layout_map, container, false);
         recyclerView = view.findViewById(R.id.recycler_view);
@@ -485,6 +496,8 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 dataUpdate.put("city", city);
                 reference.updateChildren(dataUpdate);
                 LatLng latLng = new LatLng(latitude, longitude);
+                mainLocation.set(0, latitude);
+                mainLocation.set(1, longitude);
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                 //Toast.makeText(getContext(), saveNameForReload.toString(), Toast.LENGTH_SHORT).show();
