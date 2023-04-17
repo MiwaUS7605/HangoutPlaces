@@ -94,6 +94,7 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
                 intent.putExtra("latitude", user.getLat());
                 intent.putExtra("longitude", user.getLon());
                 intent.putExtra("username", user.getUsername());
+                intent.putExtra("urlImageSent", user.getImageUrl());
                 //Toast.makeText(mContext, user.getLat()+" "+user.getLon(), Toast.LENGTH_SHORT).show();
                 localBroadcastManager.sendBroadcast(intent);
 

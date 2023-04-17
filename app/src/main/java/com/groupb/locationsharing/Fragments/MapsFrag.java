@@ -50,6 +50,7 @@ import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,6 +78,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
     ViewUserOnMapAdapter viewUserOnMapAdapter;
 
     static List<List<Double>> saveLocationForReload;
+    static List<String> saveNameForReload;
     private static LocalBroadcastManager localBroadcastManager;
     public static LocalBroadcastManager getLocalBroadcastManager(Context context) {
         if (localBroadcastManager == null) {
@@ -97,9 +99,58 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
             saveLocationForReload.add(location);
             //Toast.makeText(context,intent.getStringExtra(lat), Toast.LENGTH_SHORT).show();
             String name= intent.getStringExtra("name");
+            String imgUrlForOther = intent.getStringExtra("urlImageSent");
+            Bitmap newAvatar = BitmapFactory.decodeResource(getResources(), R.drawable.test);
+            //If avatar is default, get default image then save it to internal storage and set name according to the index of saveNameForReload
+            if(imgUrlForOther.equals("Default")){
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test);
+
+                FileOutputStream outputStream = null;
+                String nameToSave="";
+                if(saveNameForReload.size()==0){
+                    nameToSave = "0.jpg";
+                }
+                else{
+                    nameToSave = saveNameForReload.size()+".jpg";
+                }
+                Toast.makeText(context, "Saved default", Toast.LENGTH_SHORT).show();
+                try {
+                    outputStream = getActivity().openFileOutput(nameToSave, Context.MODE_PRIVATE);
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+
+                try {
+                    saveNameForReload.add(nameToSave);
+                    outputStream.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }else{
+                //If avatar is not default, get image from url then save it to internal storage and set name according to the index of saveNameForReload
+                String nameToSave="";
+                if(saveNameForReload.size()==0){
+                    nameToSave = "0.jpg";
+                }
+                else{
+                    nameToSave = saveNameForReload.size()+".jpg";
+                }
+                //Toast.makeText(context, "Saved other: "+ name, Toast.LENGTH_SHORT).show();
+
+                try {
+                    downloadImageForOther(imgUrlForOther, nameToSave);
+                    saveNameForReload.add(nameToSave);
+                    newAvatar=getImageFromStorageForOther(nameToSave);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            Bitmap smallMarker = Bitmap.createScaledBitmap(newAvatar, 154, 154, false);
             // Update the camera position on the map
             LatLng newCameraCenter = new LatLng(lat, lng);
-            mMap.addMarker(new MarkerOptions().position(newCameraCenter).title(name));
+            mMap.addMarker(new MarkerOptions().position(newCameraCenter).title(name).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraCenter));
         }
     };
@@ -125,6 +176,9 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         if(saveLocationForReload== null){
             saveLocationForReload = new ArrayList<>();
+        }
+        if(saveNameForReload== null){
+            saveNameForReload = new ArrayList<>();
         }
         View view = inflater.inflate(R.layout.layout_map, container, false);
         recyclerView = view.findViewById(R.id.recycler_view);
@@ -191,6 +245,42 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
             }
         });
     }
+    public void downloadImageForOther(String imageUrl, String namePic) throws IOException {
+// Create a new URL object from the image URL string
+        URL url = new URL(imageUrl);
+
+// Open a connection to the URL
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+// Set the request method to GET
+        connection.setRequestMethod("GET");
+
+// Get the input stream from the connection
+        InputStream inputStream = connection.getInputStream();
+
+// Create a Bitmap object from the input stream
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
+// Close the input stream and connection
+        inputStream.close();
+        connection.disconnect();
+
+// Save the image to the device
+        String filename = namePic;
+        FileOutputStream outputStream = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        outputStream.close();
+
+    }
+    public Bitmap getImageFromStorageForOther(String imageName){
+        // Get the file path for the saved image
+        String filename = imageName;
+        File file = new File(getActivity().getFilesDir(), filename);
+
+// Create a new Bitmap object from the saved image file
+        return BitmapFactory.decodeFile(file.getAbsolutePath());
+    }
+
     public void downloadImage(String imageUrl) throws IOException {
 // Create a new URL object from the image URL string
         URL url = new URL(imageUrl);
@@ -241,7 +331,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 mUsers.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     User user = snapshot1.getValue(User.class);
-                    Toast.makeText(getContext(), user.getCity(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), user.getCity(), Toast.LENGTH_SHORT).show();
                     if (user.getCity().equals(city)) {
                         mUsers.add(user);
                     }
@@ -303,10 +393,13 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 LatLng latLng = new LatLng(latitude, longitude);
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+                //Toast.makeText(getContext(), saveNameForReload.toString(), Toast.LENGTH_SHORT).show();
                 if(saveLocationForReload.size()!=0){
                     for(int i=0;i<saveLocationForReload.size();i++){
+                        Bitmap newAvatar = getImageFromStorageForOther(saveNameForReload.get(i));
+                        Bitmap smallMarker1 = Bitmap.createScaledBitmap(newAvatar, 154, 154, false);
                         LatLng newLatLng = new LatLng(saveLocationForReload.get(i).get(0), saveLocationForReload.get(i).get(1));
-                        mMap.addMarker(new MarkerOptions().position(newLatLng).title("Marker"));
+                        mMap.addMarker(new MarkerOptions().position(newLatLng).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(smallMarker1)));
                     }
                 }
             }
