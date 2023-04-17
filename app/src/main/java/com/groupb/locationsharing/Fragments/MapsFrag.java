@@ -498,7 +498,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 LatLng latLng = new LatLng(latitude, longitude);
                 mainLocation.set(0, latitude);
                 mainLocation.set(1, longitude);
-                mMap.addMarker(new MarkerOptions().position(latLng).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                mMap.addMarker(new MarkerOptions().position(latLng).title("You").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                 //Toast.makeText(getContext(), saveNameForReload.toString(), Toast.LENGTH_SHORT).show();
                 if(saveLocationForReload.size()!=0){
@@ -506,7 +506,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                         Bitmap newAvatar = getImageFromStorageForOther(saveNameForReload.get(i));
                         Bitmap smallMarker1 = Bitmap.createScaledBitmap(newAvatar, 154, 154, false);
                         LatLng newLatLng = new LatLng(saveLocationForReload.get(i).get(0), saveLocationForReload.get(i).get(1));
-                        mMap.addMarker(new MarkerOptions().position(newLatLng).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(smallMarker1)));
+                        mMap.addMarker(new MarkerOptions().position(newLatLng).title("Marker").icon(BitmapDescriptorFactory.fromBitmap(smallMarker1)).title(saveUsernameForReload.get(i)));
                     }
                 }
             }
