@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -77,8 +78,8 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
     List<User> mUsers;
     ViewUserOnMapAdapter viewUserOnMapAdapter;
 
-    static List<List<Double>> saveLocationForReload;
-    static List<String> saveNameForReload;
+    public static List<List<Double>> saveLocationForReload;
+    public static List<String> saveNameForReload;
     private static LocalBroadcastManager localBroadcastManager;
     public static LocalBroadcastManager getLocalBroadcastManager(Context context) {
         if (localBroadcastManager == null) {
@@ -154,6 +155,26 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
             mMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraCenter));
         }
     };
+    public void requestPermisstion(){
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        }
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.INTERNET}, 1);
+        }
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 1);
+        }
+    }
     @Override
     public void onStart() {
         super.onStart();
@@ -166,7 +187,6 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
     @Override
     public void onStop() {
         super.onStop();
-
         // Unregister the BroadcastReceiver when the fragment is stopped
         LocalBroadcastManager localBroadcastManager = getLocalBroadcastManager(getContext());
         localBroadcastManager.unregisterReceiver(locationReceiver);
@@ -174,6 +194,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        requestPermisstion();
         if(saveLocationForReload== null){
             saveLocationForReload = new ArrayList<>();
         }
