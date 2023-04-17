@@ -1,6 +1,8 @@
 package com.groupb.locationsharing;
 
 import static com.google.firebase.messaging.Constants.TAG;
+import static com.groupb.locationsharing.Fragments.MapsFrag.saveLocationForReload;
+import static com.groupb.locationsharing.Fragments.MapsFrag.saveNameForReload;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +49,7 @@ import com.groupb.locationsharing.Fragments.SearchFragment;
 import com.groupb.locationsharing.Fragments.UsersFragment;
 import com.groupb.locationsharing.Model.User;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -59,7 +62,29 @@ public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
     Fragment selectedFragment = null;
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //delete temp files
+        File file = new File(getFilesDir(), "profile.jpg");
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            if (!deleted) {
+                //Do nothing
+            }
+        }
+        for(int i=0; i<saveNameForReload.size();i++){
+            File file1 = new File(getFilesDir(), saveNameForReload.get(i));
+            if (file1.exists()) {
+                boolean deleted = file1.delete();
+                if (!deleted) {
+                    //Do nothing
+                }
+            }
+        }
+        saveLocationForReload.clear();
+        saveNameForReload.clear();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
