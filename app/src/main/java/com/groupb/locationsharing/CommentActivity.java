@@ -67,6 +67,10 @@ public class CommentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
+        Intent intent = getIntent();
+        postId = intent.getStringExtra("postId");
+        publisherId = intent.getStringExtra("publisherId");
+
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         addComments = findViewById(R.id.add_comments);
@@ -81,16 +85,12 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
 
-        Intent intent = getIntent();
-        postId = intent.getStringExtra("postId");
-        publisherId = intent.getStringExtra("publisherId");
-
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(this, commentList);
+        commentAdapter = new CommentAdapter(this, commentList, postId);
         recyclerView.setAdapter(commentAdapter);
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -117,9 +117,13 @@ public class CommentActivity extends AppCompatActivity {
                             .getReference("Comments").child(postId);
 
                     HashMap<String, Object> map = new HashMap<>();
+                    String commentId = databaseReference.push().getKey();
+
                     map.put("comments", addComments.getText().toString());
                     map.put("publisher", firebaseUser.getUid());
-                    databaseReference.push().setValue(map);
+                    map.put("commentId", commentId);
+
+                    databaseReference.child(commentId).setValue(map);
                     notify = true;
                     addNotifications();
                     addComments.setText("");
