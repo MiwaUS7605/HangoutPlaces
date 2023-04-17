@@ -9,6 +9,23 @@
         android:layout_weight="2"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:id="@+id/locationText"
+        android:gravity="center"
+        android:text="Getting your data, pls wait &gt;.&lt;"
+        android:textSize="32dp"
+        android:textColor="@color/white"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:id="@+id/bar"
+        android:text="Getting weather at your location"
+        android:textColor="@color/white"
+        android:gravity="center"
+        />
     <ScrollView
         android:layout_height="0dp"
         android:layout_width="match_parent"

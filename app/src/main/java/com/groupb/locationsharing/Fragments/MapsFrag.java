@@ -1,6 +1,8 @@
 package com.groupb.locationsharing.Fragments;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,17 +11,20 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -50,13 +55,22 @@ import com.groupb.locationsharing.Adapter.ViewUserOnMapAdapter;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,10 +88,10 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
     StorageReference storageReference;
     HashMap<String, Object> dataUpdate;
     String city;
-
+    TextView locationText;
     List<User> mUsers;
     ViewUserOnMapAdapter viewUserOnMapAdapter;
-
+    TextView bar;
     public static List<List<Double>> saveLocationForReload;
     public static List<String> saveNameForReload;
     private static LocalBroadcastManager localBroadcastManager;
@@ -205,6 +219,8 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        bar=view.findViewById(R.id.bar);
+        locationText = view.findViewById(R.id.locationText);
 
         mUsers = new ArrayList<>();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -219,6 +235,61 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         viewUserOnMapAdapter = new ViewUserOnMapAdapter(getContext(), mUsers);
         recyclerView.setAdapter(viewUserOnMapAdapter);
         return view;
+    }
+    public void findWeather(String thisCity){
+        // Allow network operations to be performed on the main thread (for demo purposes only)
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        String location = thisCity; // Replace with the desired location
+        String apiKey = "310352215638c3395568cef64ac062e2"; // Replace with your OpenWeatherMap API key
+
+        // Build the API URL with the location and API key
+        String apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + location + "&appid=" + apiKey;
+
+        // Create an HTTP connection and request object
+        HttpURLConnection connection = null;
+        InputStream inputStream = null;
+        try {
+            URL url = new URL(apiUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(10000 /* milliseconds */);
+            connection.setConnectTimeout(15000 /* milliseconds */);
+
+            // Connect to the API and get the response
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                throw new IOException("Response code: " + responseCode);
+            }
+            inputStream = connection.getInputStream();
+
+            // Parse the JSON response and extract the weather information
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            String jsonData = stringBuilder.toString();
+            JSONObject json = new JSONObject(jsonData);
+            JSONArray weatherArray = json.getJSONArray("weather");
+            JSONObject weatherObject = weatherArray.getJSONObject(0);
+            final String weatherDescription = weatherObject.getString("description");
+            JSONObject mainObject = json.getJSONObject("main");
+            final double temperature = mainObject.getDouble("temp");
+            double celsius = Double.parseDouble(String.format("%.2f", temperature - 273.15));
+            bar.setText("Weather: " + weatherDescription + "\nTemperature: " + celsius + "°C");
+            bar.setTextColor(Color.WHITE);
+        } catch (ProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 //    @Override
 //    public void onDestroyView() {
@@ -396,6 +467,8 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 double longitude = location.getLongitude();
                 try {
                     city = getCity(latitude, longitude);
+                    locationText.setText(city);
+                    findWeather(city);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
