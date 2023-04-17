@@ -39,6 +39,8 @@ import com.groupb.locationsharing.Service.Notifications.MyResponse;
 import com.groupb.locationsharing.Service.Notifications.Sender;
 import com.groupb.locationsharing.Service.Notifications.Token;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +57,7 @@ public class CommentActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private CommentAdapter commentAdapter;
     private List<Comment> commentList;
+    private ImageView back;
     FirebaseUser firebaseUser;
     APIService apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
     boolean notify = false;
@@ -64,32 +67,30 @@ public class CommentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Comments");
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        Intent intent = getIntent();
+        postId = intent.getStringExtra("postId");
+        publisherId = intent.getStringExtra("publisherId");
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         addComments = findViewById(R.id.add_comments);
         profile_image = findViewById(R.id.profile_image);
         post = findViewById(R.id.post_comment);
+        back = findViewById(R.id.icon);
 
-        Intent intent = getIntent();
-        postId = intent.getStringExtra("postId");
-        publisherId = intent.getStringExtra("publisherId");
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(this, commentList);
+        commentAdapter = new CommentAdapter(this, commentList, postId);
         recyclerView.setAdapter(commentAdapter);
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -116,9 +117,13 @@ public class CommentActivity extends AppCompatActivity {
                             .getReference("Comments").child(postId);
 
                     HashMap<String, Object> map = new HashMap<>();
+                    String commentId = databaseReference.push().getKey();
+
                     map.put("comments", addComments.getText().toString());
                     map.put("publisher", firebaseUser.getUid());
-                    databaseReference.push().setValue(map);
+                    map.put("commentId", commentId);
+
+                    databaseReference.child(commentId).setValue(map);
                     notify = true;
                     addNotifications();
                     addComments.setText("");
@@ -131,7 +136,9 @@ public class CommentActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             User user = dataSnapshot.getValue(User.class);
                             if (notify) {
-                                sendNotifications(publisherId, user.getUsername(), msg);
+                                if (!user.getId().equals(firebaseUser.getUid())) {
+                                    sendNotifications(publisherId, user.getUsername(), msg);
+                                }
                             }
                             notify = false;
                         }
@@ -147,6 +154,7 @@ public class CommentActivity extends AppCompatActivity {
         getImage();
         getComments();
     }
+
     private void updateToken(String token) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Tokens");
         Token token1 = new Token(token);
@@ -205,6 +213,9 @@ public class CommentActivity extends AppCompatActivity {
         map.put("text", "commented: " + addComments.getText().toString());
         map.put("postId", postId);
         map.put("isPost", "yes");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        map.put("time", dtf.format(now));
 
         reference.push().setValue(map);
     }

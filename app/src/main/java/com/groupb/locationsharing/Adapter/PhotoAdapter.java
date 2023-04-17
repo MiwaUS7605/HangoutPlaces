@@ -48,7 +48,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
                 editor.apply();
 
                 ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
+                        .replace(R.id.fragment_container, new PostDetailFragment())
+                        .addToBackStack("ProfileFragment")
+                        .commit();
             }
         });
     }

@@ -59,7 +59,8 @@ public class NotificationFragment extends Fragment {
                 notifications.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Notification notification = snapshot.getValue(Notification.class);
-                    notifications.add(notification);
+                    if(notification.getUserId().equals(firebaseUser.getUid())) continue;
+                    else notifications.add(notification);
                 }
                 Collections.reverse(notifications);
                 notificationAdapter.notifyDataSetChanged();

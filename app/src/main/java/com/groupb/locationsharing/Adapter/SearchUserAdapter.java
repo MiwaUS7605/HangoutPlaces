@@ -38,6 +38,8 @@ import com.groupb.locationsharing.Service.Notifications.MyResponse;
 import com.groupb.locationsharing.Service.Notifications.Sender;
 import com.groupb.locationsharing.Service.Notifications.Token;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
@@ -254,6 +256,9 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
         map.put("text", "started following you");
         map.put("postId", "");
         map.put("isPost", "no");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        map.put("time", dtf.format(now));
 
         reference.push().setValue(map);
     }

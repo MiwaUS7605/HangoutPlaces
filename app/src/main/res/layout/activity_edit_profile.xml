@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".EditProfileActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -16,7 +17,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?android:attr/windowBackground">
+            android:background="@color/black">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -28,7 +29,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/ic_close_image"></ImageView>
+                    android:src="@drawable/ico_back"></ImageView>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -37,6 +38,7 @@
                     android:layout_marginStart="10dp"
                     android:layout_toEndOf="@+id/close"
                     android:text="Edit Profile"
+                    android:textColor="@color/white"
                     android:textSize="18dp"
                     android:textStyle="bold"></TextView>
 
@@ -48,9 +50,10 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
-                    android:text="SAVE">
+                    android:text="SAVE"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
 
-                </TextView>
             </RelativeLayout>
 
         </androidx.appcompat.widget.Toolbar>
@@ -69,44 +72,49 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:layout_margin="10dp"></de.hdodenhof.circleimageview.CircleImageView>
+            android:layout_margin="10dp" />
 
         <TextView
             android:id="@+id/tv_change"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Change profile"></TextView>
+            android:text="Change profile"
+            android:textColor="@color/white"
+            android:textStyle="bold"></TextView>
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <EditText
             android:id="@+id/fullname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:background="@drawable/custome_entrytext"
             android:hint="Full Name"
-            app:met_floatingLabel="normal">
+            android:textColor="@color/white"
+            android:textColorHint="#818181"
+            android:textStyle="bold" />
 
-        </com.rengwuxian.materialedittext.MaterialEditText>
-
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <EditText
             android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:background="@drawable/custome_entrytext"
             android:hint="User Name"
-            app:met_floatingLabel="normal">
+            android:textColor="@color/white"
+            android:textColorHint="#818181"
+            android:textStyle="bold" />
 
-        </com.rengwuxian.materialedittext.MaterialEditText>
-
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <EditText
             android:id="@+id/bio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:background="@drawable/custome_entrytext"
             android:hint="Bio"
-            app:met_floatingLabel="normal">
-
-        </com.rengwuxian.materialedittext.MaterialEditText>
+            android:textColor="@color/white"
+            android:textColorHint="#818181"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </RelativeLayout>

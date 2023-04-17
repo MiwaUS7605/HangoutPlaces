@@ -60,6 +60,8 @@ import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.OptionsActivity;
 import com.groupb.locationsharing.R;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -415,6 +417,9 @@ public class ProfileFragment extends Fragment {
         map.put("text", "started following you");
         map.put("postId", "");
         map.put("isPost", "no");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        map.put("time", dtf.format(now));
 
         reference.push().setValue(map);
     }

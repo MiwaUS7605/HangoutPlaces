@@ -28,9 +28,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
-                    android:src="@drawable/ico_settings">
-
-                </ImageView>
+                    android:src="@drawable/ico_back" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -39,9 +37,7 @@
                     android:text="Settings"
                     android:textColor="@color/white"
                     android:textSize="18dp"
-                    android:textStyle="bold">
-
-                </TextView>
+                    android:textStyle="bold" />
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -68,7 +64,7 @@
                 android:text="Findable"
                 android:textColor="@color/white"
                 android:textSize="18dp"
-                android:textStyle="bold"></TextView>
+                android:textStyle="bold" />
 
             <Switch
                 android:id="@+id/findableBtn"
@@ -77,28 +73,16 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/change_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
             android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_weight="1"
-                android:text="Private Account"
-                android:textColor="@color/white"
-                android:textSize="18dp"
-                android:textStyle="bold"></TextView>
-
-            <Switch
-                android:id="@+id/setPrivateBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
+            android:text="Change your password"
+            android:textColor="@android:color/white"
+            android:textSize="18dp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/logout"
@@ -108,7 +92,7 @@
             android:text="Logout"
             android:textColor="@android:color/holo_red_dark"
             android:textSize="18dp"
-            android:textStyle="bold"></TextView>
+            android:textStyle="bold" />
     </LinearLayout>
 
 </RelativeLayout>

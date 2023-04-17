@@ -33,5 +33,5 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:maxLines="1"
-        android:textColor="@color/white"/>
+        android:textColor="@color/white" />
 </LinearLayout>

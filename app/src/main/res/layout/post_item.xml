@@ -5,6 +5,16 @@
     android:background="@color/white"
     android:backgroundTint="@color/black">
 
+    <ImageView
+        android:id="@+id/more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="15dp"
+        android:src="@drawable/ico_more">
+
+    </ImageView>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,14 +32,31 @@
                 android:layout_height="40dp"
                 android:layout_margin="10dp"></de.hdodenhof.circleimageview.CircleImageView>
 
-            <TextView
-                android:id="@+id/username"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:textColor="@color/white"
-                android:textSize="16dp"
-                android:textStyle="bold" />
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/top"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
+                    android:textStyle="italic" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <ImageView
@@ -62,7 +89,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/like"
-                android:text="123 likes"
                 android:textColor="@color/white"
                 android:textStyle="bold"></TextView>
 
@@ -80,7 +106,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"
                 android:layout_toLeftOf="@+id/comment"
-                android:text="32 comments"
                 android:textColor="@color/white"
                 android:textStyle="bold"></TextView>
         </RelativeLayout>

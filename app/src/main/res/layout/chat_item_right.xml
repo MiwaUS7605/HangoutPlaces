@@ -11,7 +11,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/ic_launcher"
-        android:visibility="gone"></de.hdodenhof.circleimageview.CircleImageView>
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/show_message"
@@ -22,15 +22,14 @@
         android:layout_toRightOf="@+id/profile_image"
         android:background="@drawable/background_right"
         android:padding="8dp"
-        android:text="hello this is a message"></TextView>
+        android:text="hello this is a message"/>
 
     <TextView
+        android:id="@+id/txt_seen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/txt_seen"
         android:layout_below="@+id/show_message"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        ></TextView>
+        android:layout_alignParentRight="true"/>
 
 </RelativeLayout>

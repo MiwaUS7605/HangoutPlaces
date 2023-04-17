@@ -36,6 +36,8 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 
@@ -124,6 +126,10 @@ public class AddPostActivity extends AppCompatActivity {
                         map.put("postImage", mUri);
                         map.put("postDescription", description.getText().toString());
                         map.put("publisher", FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+                        LocalDateTime now = LocalDateTime.now();
+                        map.put("time", dtf.format(now));
 
                         databaseReference.child(postId).setValue(map);
 
