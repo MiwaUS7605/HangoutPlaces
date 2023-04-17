@@ -9,16 +9,16 @@
         android:id="@+id/date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
         android:layout_centerHorizontal="true"
-        android:textStyle="italic">
-    </TextView>
+        android:textColor="@color/white"
+        android:textStyle="italic"></TextView>
 
     <RelativeLayout
         android:id="@+id/information"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/date">
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_image"
             android:layout_width="50dp"
