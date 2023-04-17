@@ -5,12 +5,14 @@ public class Notification {
     private String text;
     private String postId;
     private String isPost;
+    private String time;
 
-    public Notification(String userId, String text, String postId, String isPost) {
+    public Notification(String userId, String text, String postId, String isPost, String time) {
         this.userId = userId;
         this.text = text;
         this.postId = postId;
         this.isPost = isPost;
+        this.time = time;
     }
 
     public Notification() {
@@ -46,5 +48,13 @@ public class Notification {
 
     public void setIsPost(String isPost) {
         this.isPost = isPost;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

@@ -57,8 +57,6 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        //Log.w(TAG, firebaseUser.getUid());
-
         if (firebaseUser != null && sented.equals(firebaseUser.getUid())) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 sendOreoNotification(message);
@@ -156,7 +154,6 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Intent intent = new Intent(this, MessageActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("userid", user);
-        Log.e(TAG, user + "aaaaaaaaaaaaaaaaaaaa");
         intent.putExtras(bundle);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);

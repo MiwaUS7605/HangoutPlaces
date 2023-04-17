@@ -5,6 +5,7 @@ import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public class TranslateActivity extends AppCompatActivity {
-    Button translateButton;
+    ImageView translateButton, icon;
     TextView toText;
     EditText fromText;
     String translated;
@@ -33,7 +34,6 @@ public class TranslateActivity extends AppCompatActivity {
                 "&target=" + langTo +
                 "&source=" + langFrom;
         String responseString="";
-        // Create an HTTP connection and request object
         HttpURLConnection connection = null;
         InputStream inputStream = null;
         try {
@@ -83,6 +83,7 @@ public class TranslateActivity extends AppCompatActivity {
         translateButton = findViewById(R.id.transButton);
         fromText = findViewById(R.id.fromText);
         toText = findViewById(R.id.toText);
+        icon = findViewById(R.id.icon);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         translateButton.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +95,12 @@ public class TranslateActivity extends AppCompatActivity {
                     throw new RuntimeException(e);
                 }
                 toText.setText(translated);
+            }
+        });
+        icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }

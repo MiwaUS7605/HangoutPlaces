@@ -5,44 +5,60 @@
     android:layout_margin="8dp"
     android:background="@color/black">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"></de.hdodenhof.circleimageview.CircleImageView>
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_centerHorizontal="true"
+        android:textStyle="italic">
+    </TextView>
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/information"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_toStartOf="@id/post_image"
-        android:layout_toEndOf="@+id/profile_image"
-        android:orientation="vertical">
+        android:layout_below="@+id/date">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"></de.hdodenhof.circleimageview.CircleImageView>
 
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textColor="@color/white">
+            android:layout_marginStart="5dp"
+            android:layout_toStartOf="@id/post_image"
+            android:layout_toEndOf="@+id/profile_image"
+            android:orientation="vertical">
 
-        </TextView>
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textStyle="bold">
 
-        <TextView
-            android:id="@+id/comment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxLines="5"
-            android:textColor="@color/white">
+            </TextView>
 
-        </TextView>
-    </LinearLayout>
+            <TextView
+                android:id="@+id/comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="5"
+                android:textColor="@color/white">
 
-    <ImageView
-        android:id="@+id/post_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentEnd="true">
+            </TextView>
+        </LinearLayout>
 
-    </ImageView>
+        <ImageView
+            android:id="@+id/post_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true">
+
+        </ImageView>
+    </RelativeLayout>
+
 
 </RelativeLayout>

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -21,15 +22,18 @@ import com.groupb.locationsharing.Model.User;
 import java.util.HashMap;
 
 public class OptionsActivity extends AppCompatActivity {
-    TextView logout;
+    TextView logout, change_password;
     Switch findableSwitch;
     FirebaseUser firebaseUser;
+    ImageView back;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
 
         logout = findViewById(R.id.logout);
+        back = findViewById(R.id.icon);
+        change_password = findViewById(R.id.change_password);
         findableSwitch = findViewById(R.id.findableBtn);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -55,6 +59,12 @@ public class OptionsActivity extends AppCompatActivity {
                 } else {
                     databaseReference.child("findable").setValue("0");
                 }
+            }
+        });
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }

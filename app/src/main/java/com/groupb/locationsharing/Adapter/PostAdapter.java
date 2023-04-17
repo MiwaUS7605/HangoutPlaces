@@ -44,6 +44,8 @@ import com.groupb.locationsharing.Service.Notifications.MyResponse;
 import com.groupb.locationsharing.Service.Notifications.Sender;
 import com.groupb.locationsharing.Service.Notifications.Token;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
@@ -84,6 +86,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.description.setVisibility(View.VISIBLE);
             holder.description.setText(post.getPostDescription());
         }
+
+        holder.date.setText(post.getTime());
 
         publisherInfor(holder.profile_image, holder.username, holder.publisher, post.getPublisher());
         isLiked(post.getPostId(), holder.likeSymbol);
@@ -149,7 +153,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 editor.apply();
 
                 ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
+                        .replace(R.id.fragment_container, new PostDetailFragment())
+                        .addToBackStack("ProfileFragment")
+                        .commit();
+            }
+        });
+
+        holder.viewComments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, CommentActivity.class);
+                intent.putExtra("postId", post.getPostId());
+                intent.putExtra("publisherId", post.getPublisher());
+                mContext.startActivity(intent);
             }
         });
 
@@ -221,7 +237,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView profile_image, post_image, likeSymbol, commentSymbol;
-        public TextView username, likes, comments, publisher, description, viewComments;
+        public TextView username, likes, comments, publisher, description, viewComments, date;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -235,6 +251,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             comments = itemView.findViewById(R.id.totalComments);
             publisher = itemView.findViewById(R.id.publisher);
             description = itemView.findViewById(R.id.description);
+            date = itemView.findViewById(R.id.date);
+            viewComments = itemView.findViewById(R.id.viewComments);
         }
     }
 
@@ -329,6 +347,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         map.put("text", "liked your post");
         map.put("postId", postId);
         map.put("isPost", "yes");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        map.put("time", dtf.format(now));
 
         reference.push().setValue(map);
     }

@@ -39,6 +39,8 @@ import com.groupb.locationsharing.Service.Notifications.MyResponse;
 import com.groupb.locationsharing.Service.Notifications.Sender;
 import com.groupb.locationsharing.Service.Notifications.Token;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +57,7 @@ public class CommentActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private CommentAdapter commentAdapter;
     private List<Comment> commentList;
+    private ImageView back;
     FirebaseUser firebaseUser;
     APIService apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
     boolean notify = false;
@@ -64,21 +67,19 @@ public class CommentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Comments");
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         addComments = findViewById(R.id.add_comments);
         profile_image = findViewById(R.id.profile_image);
         post = findViewById(R.id.post_comment);
+        back = findViewById(R.id.icon);
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         Intent intent = getIntent();
         postId = intent.getStringExtra("postId");
@@ -205,6 +206,9 @@ public class CommentActivity extends AppCompatActivity {
         map.put("text", "commented: " + addComments.getText().toString());
         map.put("postId", postId);
         map.put("isPost", "yes");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        map.put("time", dtf.format(now));
 
         reference.push().setValue(map);
     }

@@ -5,15 +5,17 @@ public class Post {
     private String postId;
     private String postImage;
     private String publisher;
+    private String time;
 
     public Post() {
     }
 
-    public Post(String postDescription, String postId, String postImage, String publisher) {
+    public Post(String postDescription, String postId, String postImage, String publisher, String time) {
         this.postDescription = postDescription;
         this.postId = postId;
         this.postImage = postImage;
         this.publisher = publisher;
+        this.time = time;
     }
 
     public String getPostDescription() {
@@ -46,5 +48,13 @@ public class Post {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }
