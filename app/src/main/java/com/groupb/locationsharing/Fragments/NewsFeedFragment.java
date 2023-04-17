@@ -1,5 +1,7 @@
 package com.groupb.locationsharing.Fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -9,11 +11,13 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +30,7 @@ import com.groupb.locationsharing.Adapter.PostAdapter;
 import com.groupb.locationsharing.Adapter.StoryAdapter;
 import com.groupb.locationsharing.AddPostActivity;
 import com.groupb.locationsharing.MainActivity;
+import com.groupb.locationsharing.Model.Chat;
 import com.groupb.locationsharing.Model.Post;
 import com.groupb.locationsharing.Model.Story;
 import com.groupb.locationsharing.R;
@@ -33,7 +38,9 @@ import com.groupb.locationsharing.StartActivity;
 import com.groupb.locationsharing.TranslateActivity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class NewsFeedFragment extends Fragment {
 
@@ -47,6 +54,9 @@ public class NewsFeedFragment extends Fragment {
     private RecyclerView recyclerView_story;
     private StoryAdapter storyAdapter;
     private List<Story> storyList;
+    private TextView unseen_message;
+    final int[] count = {0};
+    Set<String> set;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,7 +72,7 @@ public class NewsFeedFragment extends Fragment {
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(getContext(), postList);
         recyclerView.setAdapter(postAdapter);
-
+        set = new HashSet<>();
         recyclerView_story = view.findViewById(R.id.recycler_view_stories);
         recyclerView_story.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -75,8 +85,10 @@ public class NewsFeedFragment extends Fragment {
         nav_chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((FragmentActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new ChatsFragment()).commit();
+                ((FragmentActivity) getContext()).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new ChatsFragment())
+                        .addToBackStack("ChatsFragment")
+                        .commit();
             }
         });
         fab = view.findViewById(R.id.fab);
@@ -97,7 +109,44 @@ public class NewsFeedFragment extends Fragment {
 
         progressBar = view.findViewById(R.id.progress_circular);
 
+        unseen_message = view.findViewById(R.id.number_unseen);
+
+        countUnseenMessage();
+
         return view;
+    }
+
+    private void countUnseenMessage() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        count[0] = 0;
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Chat chat = snapshot.getValue(Chat.class);
+                    if (!set.contains(chat.getReceiver())) {
+                        if (chat.getReceiver().equals(uid)
+                                && !chat.getSender().equals(uid)
+                                && !chat.isIsseen()) {
+                            count[0]++;
+                            set.add(chat.getReceiver());
+                        }
+                    }
+                }
+                if (count[0] == 0) {
+                    unseen_message.setVisibility(View.GONE);
+                } else {
+                    unseen_message.setVisibility(View.VISIBLE);
+                    unseen_message.setText(count[0] + "");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void checkFollowing() {

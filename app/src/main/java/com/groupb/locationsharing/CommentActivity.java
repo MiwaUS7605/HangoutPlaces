@@ -132,7 +132,9 @@ public class CommentActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             User user = dataSnapshot.getValue(User.class);
                             if (notify) {
-                                sendNotifications(publisherId, user.getUsername(), msg);
+                                if (!user.getId().equals(firebaseUser.getUid())) {
+                                    sendNotifications(publisherId, user.getUsername(), msg);
+                                }
                             }
                             notify = false;
                         }
@@ -148,6 +150,7 @@ public class CommentActivity extends AppCompatActivity {
         getImage();
         getComments();
     }
+
     private void updateToken(String token) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Tokens");
         Token token1 = new Token(token);

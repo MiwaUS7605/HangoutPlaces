@@ -186,7 +186,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             User user = dataSnapshot.getValue(User.class);
                             if (notify) {
-                                sendNotifications(post.getPublisher(), user.getUsername(), msg, position);
+                                if (!user.getId().equals(firebaseUser.getUid())) {
+                                    sendNotifications(post.getPublisher(), user.getUsername(), msg, position);
+                                }
                             }
                             notify = false;
                         }
