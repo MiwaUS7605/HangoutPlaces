@@ -347,6 +347,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
 
             }
         });
+        Toast.makeText(getActivity(), "Loaded user", Toast.LENGTH_SHORT).show();
     }
     public void downloadImageForOther(String imageUrl, String namePic) throws IOException {
 // Create a new URL object from the image URL string
@@ -373,7 +374,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         FileOutputStream outputStream = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
         outputStream.close();
-
+        Toast.makeText(getActivity(), "Downloaded images for others", Toast.LENGTH_SHORT).show();
     }
     public Bitmap getImageFromStorageForOther(String imageName){
         // Get the file path for the saved image
@@ -409,7 +410,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         FileOutputStream outputStream = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
         outputStream.close();
-
+        Toast.makeText(getActivity(), "Downloaded image for owner", Toast.LENGTH_SHORT).show();
     }
     public void getImageFromStorage(){
         // Get the file path for the saved image
@@ -478,8 +479,10 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 double longitude = location.getLongitude();
                 try {
                     city = getCity(latitude, longitude);
+                    Toast.makeText(getActivity(), "Got city", Toast.LENGTH_SHORT).show();
                     locationText.setText(city);
                     findWeather(city);
+                    Toast.makeText(getActivity(), "Got weather", Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
