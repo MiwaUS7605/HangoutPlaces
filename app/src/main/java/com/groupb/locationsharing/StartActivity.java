@@ -26,6 +26,11 @@ public class StartActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+        //FirebaseAuth.getInstance().signOut();
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 
     @Override
