@@ -2,10 +2,13 @@ package com.groupb.locationsharing.Fragments;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -57,10 +60,54 @@ public class NewsFeedFragment extends Fragment {
     private TextView unseen_message;
     final int[] count = {0};
     Set<String> set;
+    private static final int MY_PERMISSIONS_REQUEST = 123;
 
+    public void requestPermission() {
+        String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_NETWORK_STATE};
+        List<String> permissionsToRequest = new ArrayList<>();
+
+        // Check if each permission has been granted, and add it to the list of permissions to request if it hasn't been granted
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(permission);
+            }
+        }
+
+        // If there are permissions to request, request them from the user
+        if (!permissionsToRequest.isEmpty()) {
+            requestPermissions(permissionsToRequest.toArray(new String[0]), MY_PERMISSIONS_REQUEST);
+        } else {
+            // All permissions have already been granted, so continue with the fragment
+            // Do something
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_PERMISSIONS_REQUEST) {
+            // Check if all permissions were granted
+            boolean allPermissionsGranted = true;
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+
+            if (allPermissionsGranted) {
+                // All permissions were granted, so continue with the fragment
+                // Do something
+            } else {
+                // Permissions were not granted, so close the app
+                getActivity().finish();
+            }
+        }
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        requestPermission();
         View view = inflater.inflate(R.layout.fragment_news_feed, container, false);
         recyclerView = view.findViewById(R.id.recycler_view);
         nav_chat = view.findViewById(R.id.nav_chat);

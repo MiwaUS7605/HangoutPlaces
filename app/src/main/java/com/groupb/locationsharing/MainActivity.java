@@ -1,8 +1,10 @@
 package com.groupb.locationsharing;
 
 import static com.google.firebase.messaging.Constants.TAG;
+import static com.groupb.locationsharing.Fragments.MapsFrag.mainLocation;
 import static com.groupb.locationsharing.Fragments.MapsFrag.saveLocationForReload;
 import static com.groupb.locationsharing.Fragments.MapsFrag.saveNameForReload;
+import static com.groupb.locationsharing.Fragments.MapsFrag.saveUsernameForReload;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     Fragment selectedFragment = null;
     @Override
     protected void onDestroy() {
+        Toast.makeText(this, "Delete temp files", Toast.LENGTH_SHORT).show();
         super.onDestroy();
         //delete temp files
         File file = new File(getFilesDir(), "profile.jpg");
@@ -84,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         }
         saveLocationForReload.clear();
         saveNameForReload.clear();
+        saveUsernameForReload.clear();
+        mainLocation.clear();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
