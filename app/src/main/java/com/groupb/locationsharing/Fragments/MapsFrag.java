@@ -93,8 +93,11 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
     List<User> mUsers;
     ViewUserOnMapAdapter viewUserOnMapAdapter;
     TextView bar;
+    //Location list
     public static List<List<Double>> saveLocationForReload;
+    //Name image list
     public static List<String> saveNameForReload;
+    //Username list
     public static List<String> saveUsernameForReload;
     private static LocalBroadcastManager localBroadcastManager;
     public static List<Double>mainLocation;
@@ -114,59 +117,71 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
             List<Double> location = new ArrayList<>();
             location.add(lat);
             location.add(lng);
-            saveLocationForReload.add(location);
+
             //Toast.makeText(context,intent.getStringExtra(lat), Toast.LENGTH_SHORT).show();
             String name= intent.getStringExtra("name");
             String username= intent.getStringExtra("username");
             String imgUrlForOther = intent.getStringExtra("urlImageSent");
             Bitmap newAvatar = BitmapFactory.decodeResource(getResources(), R.drawable.test);
-            //If avatar is default, get default image then save it to internal storage and set name according to the index of saveNameForReload
-            if(imgUrlForOther.equals("Default")){
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test);
-
-                FileOutputStream outputStream = null;
-                String nameToSave="";
-                if(saveNameForReload.size()==0){
-                    nameToSave = "0.jpg";
-                }
-                else{
-                    nameToSave = saveNameForReload.size()+".jpg";
-                }
-                Toast.makeText(context, "Saved default", Toast.LENGTH_SHORT).show();
-                try {
-                    outputStream = getActivity().openFileOutput(nameToSave, Context.MODE_PRIVATE);
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-
-                try {
-                    saveNameForReload.add(nameToSave);
-                    outputStream.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            if(saveUsernameForReload.contains(username)){
+                //Toast.makeText(context, "Detect appeared usr", Toast.LENGTH_SHORT).show();
+                //If have username, load image from internal storage, update location
+                int indexOfUsername = saveUsernameForReload.indexOf(username);
+                String nameToLoad = saveNameForReload.get(indexOfUsername);
+                newAvatar = getImageFromStorageForOther(nameToLoad);
+                saveLocationForReload.set(indexOfUsername,location);
             }else{
-                //If avatar is not default, get image from url then save it to internal storage and set name according to the index of saveNameForReload
-                String nameToSave="";
-                if(saveNameForReload.size()==0){
-                    nameToSave = "0.jpg";
-                }
-                else{
-                    nameToSave = saveNameForReload.size()+".jpg";
-                }
-                //Toast.makeText(context, "Saved other: "+ name, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "Download new image for usr", Toast.LENGTH_SHORT).show();
+                //if not have username, download new image and save it to internal storage
+                //If avatar is default, get default image then save it to internal storage and set name according to the index of saveNameForReload
+                if(imgUrlForOther.equals("Default")){
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test);
 
-                try {
-                    downloadImageForOther(imgUrlForOther, nameToSave);
-                    saveNameForReload.add(nameToSave);
-                    newAvatar=getImageFromStorageForOther(nameToSave);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    FileOutputStream outputStream = null;
+                    String nameToSave="";
+                    if(saveNameForReload.size()==0){
+                        nameToSave = "0.jpg";
+                    }
+                    else{
+                        nameToSave = saveNameForReload.size()+".jpg";
+                    }
+                    //Toast.makeText(context, "Saved default", Toast.LENGTH_SHORT).show();
+                    try {
+                        outputStream = getActivity().openFileOutput(nameToSave, Context.MODE_PRIVATE);
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+
+                    try {
+                        saveNameForReload.add(nameToSave);
+                        outputStream.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }else{
+                    //If avatar is not default, get image from url then save it to internal storage and set name according to the index of saveNameForReload
+                    String nameToSave="";
+                    if(saveNameForReload.size()==0){
+                        nameToSave = "0.jpg";
+                    }
+                    else{
+                        nameToSave = saveNameForReload.size()+".jpg";
+                    }
+                    //Toast.makeText(context, "Saved other: "+ name, Toast.LENGTH_SHORT).show();
+
+                    try {
+                        downloadImageForOther(imgUrlForOther, nameToSave);
+                        saveNameForReload.add(nameToSave);
+                        newAvatar=getImageFromStorageForOther(nameToSave);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
+                saveUsernameForReload.add(username);
+                saveLocationForReload.add(location);
             }
-            saveUsernameForReload.add(username);
             Bitmap smallMarker = Bitmap.createScaledBitmap(newAvatar, 154, 154, false);
             // Update the camera position on the map
             LatLng newCameraCenter = new LatLng(lat, lng);
@@ -327,19 +342,30 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 }
                 User user = snapshot.getValue(User.class);
                 String imgSTR = user.getImageUrl();
+                String filename = "profile.jpg";
+                File file = new File(getActivity().getFilesDir(), filename);
 
-                if (user.getImageUrl().equals("default")) {
-                    //Toast.makeText(getContext(), "No image", Toast.LENGTH_SHORT).show();
-                } else {
-                    //Toast.makeText(getContext(), "Get image from server: "+imgSTR, Toast.LENGTH_SHORT).show();
-                    try {
-                        downloadImage(imgSTR);
-                    } catch (IOException e) {
-                        //Toast.makeText(getContext(), "Error when download image: "+e.getMessage(), Toast.LENGTH_SHORT).show();
-                        throw new RuntimeException(e);
-                    }
+                if(file.exists()) {
+                    //Toast.makeText(getContext(), "Load image from storage", Toast.LENGTH_SHORT).show();
+                    // file exists, skip download and just load the image
                     getImageFromStorage();
+                } else {
+                    //Toast.makeText(getContext(), "Download new image", Toast.LENGTH_SHORT).show();
+                    if (user.getImageUrl().equals("default")) {
+                        //Toast.makeText(getContext(), "No image", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //Toast.makeText(getContext(), "Get image from server: "+imgSTR, Toast.LENGTH_SHORT).show();
+                        try {
+                            downloadImage(imgSTR);
+                        } catch (IOException e) {
+                            //Toast.makeText(getContext(), "Error when download image: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            throw new RuntimeException(e);
+                        }
+                        getImageFromStorage();
+                    }
                 }
+
+
             }
 
             @Override
@@ -347,7 +373,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
 
             }
         });
-        Toast.makeText(getActivity(), "Loaded user", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "Loaded user", Toast.LENGTH_SHORT).show();
     }
     public void downloadImageForOther(String imageUrl, String namePic) throws IOException {
 // Create a new URL object from the image URL string
@@ -374,7 +400,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         FileOutputStream outputStream = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
         outputStream.close();
-        Toast.makeText(getActivity(), "Downloaded images for others", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "Downloaded images for others", Toast.LENGTH_SHORT).show();
     }
     public Bitmap getImageFromStorageForOther(String imageName){
         // Get the file path for the saved image
@@ -410,7 +436,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         FileOutputStream outputStream = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
         outputStream.close();
-        Toast.makeText(getActivity(), "Downloaded image for owner", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "Downloaded image for owner", Toast.LENGTH_SHORT).show();
     }
     public void getImageFromStorage(){
         // Get the file path for the saved image
@@ -479,10 +505,10 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
                 double longitude = location.getLongitude();
                 try {
                     city = getCity(latitude, longitude);
-                    Toast.makeText(getActivity(), "Got city", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "Got city", Toast.LENGTH_SHORT).show();
                     locationText.setText(city);
                     findWeather(city);
-                    Toast.makeText(getActivity(), "Got weather", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "Got weather", Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
