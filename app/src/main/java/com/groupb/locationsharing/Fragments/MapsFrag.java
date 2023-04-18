@@ -189,26 +189,8 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
             mMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraCenter));
         }
     };
-    public void requestPermisstion(){
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-        }
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.INTERNET}, 1);
-        }
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        }
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 1);
-        }
-    }
+
+
     @Override
     public void onStart() {
         super.onStart();
@@ -225,10 +207,13 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         LocalBroadcastManager localBroadcastManager = getLocalBroadcastManager(getContext());
         localBroadcastManager.unregisterReceiver(locationReceiver);
     }
+//    public void onAttach(){
+//        super.onAttach(getContext());
+//        requestPermission();
+//    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        requestPermisstion();
         if(saveLocationForReload== null){
             saveLocationForReload = new ArrayList<>();
         }
@@ -331,6 +316,7 @@ public class MapsFrag extends Fragment implements OnMapReadyCallback {
         SharedPreferences prefs = getContext().getSharedPreferences("PREFS", Context.MODE_PRIVATE);
 
         profileId = prefs.getString("profileId", "none");
+        profileId= firebaseUser.getUid();
         DatabaseReference reference = FirebaseDatabase.getInstance()
                 .getReference("Users").child(profileId);
 
