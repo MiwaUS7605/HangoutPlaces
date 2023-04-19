@@ -107,7 +107,7 @@ public class NewsFeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //requestPermission();
+        requestPermission();
         View view = inflater.inflate(R.layout.fragment_news_feed, container, false);
         recyclerView = view.findViewById(R.id.recycler_view);
         nav_chat = view.findViewById(R.id.nav_chat);
