@@ -100,11 +100,7 @@ public class CommentActivity extends AppCompatActivity {
                             Log.w(ContentValues.TAG, "Fetching FCM registration token failed", task.getException());
                             return;
                         }
-
-                        // Get new FCM registration token
                         String token = task.getResult();
-                        //Toast.makeText(getContext(), token, Toast.LENGTH_SHORT).show();
-                        // Log and/or update token as needed
                         updateToken(token);
                     }
                 });
@@ -136,9 +132,7 @@ public class CommentActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             User user = dataSnapshot.getValue(User.class);
                             if (notify) {
-                                if (!user.getId().equals(firebaseUser.getUid())) {
-                                    sendNotifications(publisherId, user.getUsername(), msg);
-                                }
+                                sendNotifications(publisherId, user.getUsername(), msg);
                             }
                             notify = false;
                         }

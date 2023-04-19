@@ -192,9 +192,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             User user = dataSnapshot.getValue(User.class);
                             if (notify) {
-                                if (!user.getId().equals(firebaseUser.getUid())) {
-                                    sendNotifications(post.getPublisher(), user.getUsername(), msg, position);
-                                }
+                                sendNotifications(post.getPublisher(), user.getUsername(), msg, position);
                             }
                             notify = false;
                         }
@@ -237,7 +235,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        switch (menuItem.getItemId()){
+                        switch (menuItem.getItemId()) {
                             case R.id.edit:
                                 editPost(post.getPostId());
                                 return true;
@@ -246,7 +244,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                if(task.isSuccessful()){
+                                                if (task.isSuccessful()) {
                                                     Toast.makeText(mContext, "Deleted Post", Toast.LENGTH_SHORT).show();
                                                 }
                                             }
