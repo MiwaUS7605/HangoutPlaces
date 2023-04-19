@@ -57,6 +57,10 @@
             android:exported="true"
             android:value="@integer/google_play_services_version" />
 
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="langid"/>
+
         <activity
             android:name=".TranslateActivity"
             android:exported="false" />

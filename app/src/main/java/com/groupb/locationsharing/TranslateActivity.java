@@ -10,8 +10,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +18,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Locale;
+
 
 public class TranslateActivity extends AppCompatActivity {
     ImageView translateButton, icon;
@@ -27,13 +28,26 @@ public class TranslateActivity extends AppCompatActivity {
     EditText fromText;
     String translated;
 
-    private static String translate(String langFrom, String langTo, String text) throws IOException {
+    public static boolean isVietnamese(String input) {
+        // Danh sách các ký tự tiếng Việt trong bảng mã Unicode
+        final String vietnameseCharacters = "ĂẮẰẤẾẶẲẨÊẾỀỂỆƠÓỐỒỐỚỢỞỜỤỨỪỰỬÍỐỚỜỢỞÚỨỪỰỬÝĐ";
+        String upperCase = input.toUpperCase(Locale.ROOT);
+        for (char c : upperCase.toCharArray()) {
+            // Kiểm tra xem ký tự c có nằm trong danh sách ký tự tiếng Việt không
+            if (vietnameseCharacters.contains(Character.toString(c))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String translate(String langFrom, String langTo, String text) throws IOException {
         // INSERT YOU URL HERE
         String urlStr = "https://script.google.com/macros/s/AKfycbxM5RTr1vtx3e5HvzsWjPIhR9M46ok16FG0V6mjmajg2oPSvZ0duHq2mEXuB1fXnPiIoQ/exec" +
                 "?q=" + URLEncoder.encode(text, "UTF-8") +
                 "&target=" + langTo +
                 "&source=" + langFrom;
-        String responseString="";
+        String responseString = "";
         HttpURLConnection connection = null;
         InputStream inputStream = null;
         try {
@@ -76,6 +90,7 @@ public class TranslateActivity extends AppCompatActivity {
         }
         return responseString;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,8 +104,13 @@ public class TranslateActivity extends AppCompatActivity {
         translateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String input = fromText.getText().toString();
                 try {
-                    translated = translate("en", "vi", fromText.getText().toString());
+                    if (isVietnamese(input)) {
+                        translated = translate("vi", "en", input);
+                    } else {
+                        translated = translate("en", "vi", input);
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

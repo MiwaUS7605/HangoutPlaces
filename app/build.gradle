@@ -39,8 +39,6 @@ dependencies {
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:31.2.3')
 
-
-    // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
@@ -56,27 +54,19 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
-
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
-
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'androidx.work:work-runtime:2.8.1'
     implementation 'com.squareup.picasso:picasso:2.8'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
-
     implementation 'com.github.shts:StoriesProgressView:3.0.0'
-
-    //implementation 'com.github.ArthurHub:Android-Image-Cropper:2.3.1'
-
-    //implementation ('com.github.CanHub:Android-Image-Cropper:4.5.0')
-    //implementation("com.vanniktech:android-image-cropper:4.5.0")
     implementation 'com.github.bfrachia:android-image-cropper:2.7.0'
+    implementation 'com.google.android.gms:play-services-mlkit-language-id:17.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

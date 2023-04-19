@@ -61,7 +61,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity {
     FirebaseUser firebaseUser;
     DatabaseReference reference;
-    Button logoutBtn;
 
     BottomNavigationView bottomNavigationView;
     Fragment selectedFragment = null;
