@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
     Fragment selectedFragment = null;
+
     @Override
     protected void onDestroy() {
         Toast.makeText(this, "Delete temp files", Toast.LENGTH_SHORT).show();
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 //Do nothing
             }
         }
-        for(int i=0; i<saveNameForReload.size();i++){
+        for (int i = 0; i < saveNameForReload.size(); i++) {
             File file1 = new File(getFilesDir(), saveNameForReload.get(i));
             if (file1.exists()) {
                 boolean deleted = file1.delete();
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         saveUsernameForReload.clear();
         mainLocation.clear();
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
