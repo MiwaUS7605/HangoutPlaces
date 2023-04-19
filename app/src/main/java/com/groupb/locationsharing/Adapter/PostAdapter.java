@@ -107,6 +107,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         publisherInfor(holder.profile_image, holder.username, holder.publisher, post.getPublisher());
         isLiked(post.getPostId(), holder.likeSymbol);
+        isSaved(post.getPostId(), holder.saveSymbol);
         totalLikes(holder.likes, post.getPostId());
         totalComments(holder.comments, post.getPostId());
 
@@ -235,6 +236,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }
         });
 
+        holder.saveSymbol.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (holder.saveSymbol.getTag().equals("save")) {
+                    FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
+                            .child(post.getPostId()).setValue(true);
+                } else {
+                    FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
+                            .child(post.getPostId()).removeValue();
+                }
+            }
+        });
+
         holder.commentSymbol.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -306,12 +320,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView profile_image, post_image, likeSymbol, commentSymbol, more;
+        public ImageView profile_image, post_image, likeSymbol, commentSymbol, more, saveSymbol;
         public TextView username, likes, comments, publisher, description, translate, date;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
+            saveSymbol = itemView.findViewById(R.id.save);
             profile_image = itemView.findViewById(R.id.profile_image);
             post_image = itemView.findViewById(R.id.post_image);
             likeSymbol = itemView.findViewById(R.id.like);
@@ -512,6 +526,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }
         });
     }
+
     public static boolean isVietnamese(String input) {
         // Danh sách các ký tự tiếng Việt trong bảng mã Unicode
         final String vietnameseCharacters = "ĂẮẰẤẾẶẲẨÊẾỀỂỆƠÓỐỒỐỚỢỞỜỤỨỪỰỬÍỐỚỜỢỞÚỨỪỰỬÝĐ";
@@ -573,5 +588,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }
         }
         return responseString;
+    }
+    private void isSaved(String postId, ImageView imageView){
+        FirebaseUser firebaseUser1 = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Saves")
+                .child(firebaseUser1.getUid());
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child(postId).exists()){
+                    imageView.setImageResource(R.drawable.ico_saved);
+                    imageView.setTag("saved");
+                }else{
+                    imageView.setImageResource(R.drawable.ico_save);
+                    imageView.setTag("save");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

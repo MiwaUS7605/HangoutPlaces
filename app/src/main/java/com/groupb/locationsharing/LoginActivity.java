@@ -50,9 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                 String email_Txt = String.valueOf(email.getText());
                 String password_Txt = String.valueOf(password.getText());
 
-                Log.e(TAG, "Dang nhap");
-
-                if(TextUtils.isEmpty(password_Txt) || TextUtils.isEmpty(email_Txt)){
+                if (TextUtils.isEmpty(password_Txt) || TextUtils.isEmpty(email_Txt)) {
                     Toast.makeText(
                             getApplicationContext(),
                             "All field must be filled",
@@ -60,23 +58,21 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     auth.signInWithEmailAndPassword(email_Txt, password_Txt)
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()){
-                                //Log.e(TAG, "Dang nhap");
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                                finish();
-                            }
-                            else {
-                                Toast.makeText(
-                                        getApplicationContext(),
-                                        "Authentication Failed",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        Toast.makeText(
+                                                getApplicationContext(),
+                                                "Authentication Failed",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                 }
             }
         });

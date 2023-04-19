@@ -67,6 +67,7 @@ dependencies {
     implementation 'com.github.shts:StoriesProgressView:3.0.0'
     implementation 'com.github.bfrachia:android-image-cropper:2.7.0'
     implementation 'com.google.android.gms:play-services-mlkit-language-id:17.0.0'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.25'
 }
 
 apply plugin: 'com.google.gms.google-services'
