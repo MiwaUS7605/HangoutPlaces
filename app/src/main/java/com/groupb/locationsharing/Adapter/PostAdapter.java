@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -50,10 +51,19 @@ import com.groupb.locationsharing.Service.Notifications.MyResponse;
 import com.groupb.locationsharing.Service.Notifications.Sender;
 import com.groupb.locationsharing.Service.Notifications.Token;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -97,6 +107,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         publisherInfor(holder.profile_image, holder.username, holder.publisher, post.getPublisher());
         isLiked(post.getPostId(), holder.likeSymbol);
+        isSaved(post.getPostId(), holder.saveSymbol);
         totalLikes(holder.likes, post.getPostId());
         totalComments(holder.comments, post.getPostId());
 
@@ -164,14 +175,30 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         .commit();
             }
         });
-
-        holder.viewComments.setOnClickListener(new View.OnClickListener() {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        final boolean[] isTrans = {false};
+        holder.translate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, CommentActivity.class);
-                intent.putExtra("postId", post.getPostId());
-                intent.putExtra("publisherId", post.getPublisher());
-                mContext.startActivity(intent);
+                if (!isTrans[0]) {
+                    holder.translate.setText("Restore");
+                    String input = holder.description.getText().toString();
+                    try {
+                        if (isVietnamese(input)) {
+                            holder.description.setText(translate("vi", "en", input));
+                        } else {
+                            holder.description.setText(translate("en", "vi", input));
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    isTrans[0] = true;
+                } else {
+                    holder.translate.setText("Translate this section");
+                    holder.description.setText(post.getPostDescription());
+                    isTrans[0] = false;
+                }
             }
         });
 
@@ -192,9 +219,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             User user = dataSnapshot.getValue(User.class);
                             if (notify) {
-                                if (!user.getId().equals(firebaseUser.getUid())) {
-                                    sendNotifications(post.getPublisher(), user.getUsername(), msg, position);
-                                }
+                                sendNotifications(post.getPublisher(), user.getUsername(), msg, position);
                             }
                             notify = false;
                         }
@@ -207,6 +232,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 } else {
                     FirebaseDatabase.getInstance().getReference().child("Likes").child(post.getPostId())
                             .child(firebaseUser.getUid()).removeValue();
+                }
+            }
+        });
+
+        holder.saveSymbol.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (holder.saveSymbol.getTag().equals("save")) {
+                    FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
+                            .child(post.getPostId()).setValue(true);
+                } else {
+                    FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
+                            .child(post.getPostId()).removeValue();
                 }
             }
         });
@@ -237,7 +275,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        switch (menuItem.getItemId()){
+                        switch (menuItem.getItemId()) {
                             case R.id.edit:
                                 editPost(post.getPostId());
                                 return true;
@@ -246,7 +284,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                if(task.isSuccessful()){
+                                                if (task.isSuccessful()) {
                                                     Toast.makeText(mContext, "Deleted Post", Toast.LENGTH_SHORT).show();
                                                 }
                                             }
@@ -282,12 +320,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView profile_image, post_image, likeSymbol, commentSymbol, more;
-        public TextView username, likes, comments, publisher, description, viewComments, date;
+        public ImageView profile_image, post_image, likeSymbol, commentSymbol, more, saveSymbol;
+        public TextView username, likes, comments, publisher, description, translate, date;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
+            saveSymbol = itemView.findViewById(R.id.save);
             profile_image = itemView.findViewById(R.id.profile_image);
             post_image = itemView.findViewById(R.id.post_image);
             likeSymbol = itemView.findViewById(R.id.like);
@@ -298,7 +336,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             publisher = itemView.findViewById(R.id.publisher);
             description = itemView.findViewById(R.id.description);
             date = itemView.findViewById(R.id.date);
-            viewComments = itemView.findViewById(R.id.viewComments);
+            translate = itemView.findViewById(R.id.translate);
             more = itemView.findViewById(R.id.more);
         }
     }
@@ -480,6 +518,91 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 editText.setText(snapshot.getValue(Post.class).getPostDescription());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public static boolean isVietnamese(String input) {
+        // Danh sách các ký tự tiếng Việt trong bảng mã Unicode
+        final String vietnameseCharacters = "ĂẮẰẤẾẶẲẨÊẾỀỂỆƠÓỐỒỐỚỢỞỜỤỨỪỰỬÍỐỚỜỢỞÚỨỪỰỬÝĐ";
+        String upperCase = input.toUpperCase(Locale.ROOT);
+        for (char c : upperCase.toCharArray()) {
+            // Kiểm tra xem ký tự c có nằm trong danh sách ký tự tiếng Việt không
+            if (vietnameseCharacters.contains(Character.toString(c))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String translate(String langFrom, String langTo, String text) throws IOException {
+        // INSERT YOU URL HERE
+        String urlStr = "https://script.google.com/macros/s/AKfycbxM5RTr1vtx3e5HvzsWjPIhR9M46ok16FG0V6mjmajg2oPSvZ0duHq2mEXuB1fXnPiIoQ/exec" +
+                "?q=" + URLEncoder.encode(text, "UTF-8") +
+                "&target=" + langTo +
+                "&source=" + langFrom;
+        String responseString = "";
+        HttpURLConnection connection = null;
+        InputStream inputStream = null;
+        try {
+            URL url = new URL(urlStr);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(10000 /* milliseconds */);
+            connection.setConnectTimeout(15000 /* milliseconds */);
+
+            // Connect to the API and get the response
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                throw new IOException("Response code: " + responseCode);
+            }
+            inputStream = connection.getInputStream();
+
+            // Parse the JSON response and extract the weather information
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            responseString = stringBuilder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the input stream and disconnect the connection
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return responseString;
+    }
+    private void isSaved(String postId, ImageView imageView){
+        FirebaseUser firebaseUser1 = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Saves")
+                .child(firebaseUser1.getUid());
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child(postId).exists()){
+                    imageView.setImageResource(R.drawable.ico_saved);
+                    imageView.setTag("saved");
+                }else{
+                    imageView.setImageResource(R.drawable.ico_save);
+                    imageView.setTag("save");
+                }
             }
 
             @Override

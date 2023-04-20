@@ -33,6 +33,14 @@
             android:maxLines="6"
             android:textColor="@color/white"></TextView>
 
+        <TextView
+            android:id="@+id/translate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Translate this section"
+            android:textStyle="italic"
+            android:textColor="#8C8A8A"></TextView>
+
     </LinearLayout>
 
 </RelativeLayout>

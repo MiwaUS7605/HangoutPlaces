@@ -202,8 +202,44 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/last_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="-5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="-5dp"
+                android:background="@drawable/custome_entrytext"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <ImageView
+                    android:id="@+id/photos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:src="@drawable/ico_photo"
+                    android:background="@color/gray"></ImageView>
+
+                <ImageView
+                    android:id="@+id/saved_photos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:src="@drawable/ico_saved"
+                    android:background="@color/black"></ImageView>
+
+            </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_saved"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 

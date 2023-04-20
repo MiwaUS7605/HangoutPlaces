@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +30,18 @@ import com.groupb.locationsharing.MainActivity;
 import com.groupb.locationsharing.Model.Comment;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
+import com.groupb.locationsharing.TranslateActivity;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
 
@@ -48,11 +59,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView profile_image;
-        public TextView username, comment;
+        public TextView username, comment, translate;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
+            translate = itemView.findViewById(R.id.translate);
             profile_image = itemView.findViewById(R.id.profile_image);
             username = itemView.findViewById(R.id.username);
             comment = itemView.findViewById(R.id.comment);
@@ -68,6 +79,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull CommentAdapter.ViewHolder holder, int position) {
+        final boolean[] isTrans = {false};
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         Comment comment = mComments.get(position);
@@ -125,6 +137,31 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 return true;
             }
         });
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        holder.translate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isTrans[0]) {
+                    holder.translate.setText("Restore");
+                    String input = holder.comment.getText().toString();
+                    try {
+                        if (isVietnamese(input)) {
+                            holder.comment.setText(translate("vi", "en", input));
+                        } else {
+                            holder.comment.setText(translate("en", "vi", input));
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    isTrans[0] = true;
+                } else {
+                    holder.translate.setText("Translate this section");
+                    holder.comment.setText(comment.getComments());
+                    isTrans[0] = false;
+                }
+            }
+        });
     }
 
     @Override
@@ -153,5 +190,68 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
             }
         });
+    }
+
+    public static boolean isVietnamese(String input) {
+        // Danh sách các ký tự tiếng Việt trong bảng mã Unicode
+        final String vietnameseCharacters = "ĂẮẰẤẾẶẲẨÊẾỀỂỆƠÓỐỒỐỚỢỞỜỤỨỪỰỬÍỐỚỜỢỞÚỨỪỰỬÝĐ";
+        String upperCase = input.toUpperCase(Locale.ROOT);
+        for (char c : upperCase.toCharArray()) {
+            // Kiểm tra xem ký tự c có nằm trong danh sách ký tự tiếng Việt không
+            if (vietnameseCharacters.contains(Character.toString(c))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String translate(String langFrom, String langTo, String text) throws IOException {
+        // INSERT YOU URL HERE
+        String urlStr = "https://script.google.com/macros/s/AKfycbxM5RTr1vtx3e5HvzsWjPIhR9M46ok16FG0V6mjmajg2oPSvZ0duHq2mEXuB1fXnPiIoQ/exec" +
+                "?q=" + URLEncoder.encode(text, "UTF-8") +
+                "&target=" + langTo +
+                "&source=" + langFrom;
+        String responseString = "";
+        HttpURLConnection connection = null;
+        InputStream inputStream = null;
+        try {
+            URL url = new URL(urlStr);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(10000 /* milliseconds */);
+            connection.setConnectTimeout(15000 /* milliseconds */);
+
+            // Connect to the API and get the response
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                throw new IOException("Response code: " + responseCode);
+            }
+            inputStream = connection.getInputStream();
+
+            // Parse the JSON response and extract the weather information
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            responseString = stringBuilder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the input stream and disconnect the connection
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return responseString;
     }
 }

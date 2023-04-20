@@ -16,8 +16,6 @@ public class StartActivity extends AppCompatActivity {
     Button login;
     Button register;
 
-    FirebaseUser firebaseUser;
-
     @Override
     protected void onStart() {
         super.onStart();
