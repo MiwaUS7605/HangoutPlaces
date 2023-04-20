@@ -77,19 +77,21 @@ public class MainActivity extends AppCompatActivity {
                 //Do nothing
             }
         }
-        for (int i = 0; i < saveNameForReload.size(); i++) {
-            File file1 = new File(getFilesDir(), saveNameForReload.get(i));
-            if (file1.exists()) {
-                boolean deleted = file1.delete();
-                if (!deleted) {
-                    //Do nothing
+        if(saveNameForReload!=null){
+            for (int i = 0; i < saveNameForReload.size(); i++) {
+                File file1 = new File(getFilesDir(), saveNameForReload.get(i));
+                if (file1.exists()) {
+                    boolean deleted = file1.delete();
+                    if (!deleted) {
+                        //Do nothing
+                    }
                 }
             }
+            saveLocationForReload.clear();
+            saveNameForReload.clear();
+            saveUsernameForReload.clear();
+            mainLocation.clear();
         }
-        saveLocationForReload.clear();
-        saveNameForReload.clear();
-        saveUsernameForReload.clear();
-        mainLocation.clear();
     }
 
     @Override
