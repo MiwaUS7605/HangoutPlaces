@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 //Do nothing
             }
         }
-        if(saveNameForReload!=null){
+        if (saveNameForReload != null) {
             for (int i = 0; i < saveNameForReload.size(); i++) {
                 File file1 = new File(getFilesDir(), saveNameForReload.get(i));
                 if (file1.exists()) {
@@ -111,20 +111,20 @@ public class MainActivity extends AppCompatActivity {
 
             String postId = getIntent().getStringExtra("postId");
 
-            if (postId != null) {
-                SharedPreferences.Editor editor = getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                editor.putString("postId", postId);
-                editor.apply();
-
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
-            } else {
+            if (publisher != null) {
                 SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
                 editor.putString("profileId", publisher);
                 editor.apply();
 
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container
                         , new ProfileFragment()).commit();
+            } else if (postId != null) {
+                SharedPreferences.Editor editor = getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                editor.putString("postId", postId);
+                editor.apply();
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
             }
         } else {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container

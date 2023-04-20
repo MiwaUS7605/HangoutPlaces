@@ -149,6 +149,13 @@ public class CommentActivity extends AppCompatActivity {
         getComments();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        finish();
+    }
+
     private void updateToken(String token) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Tokens");
         Token token1 = new Token(token);
