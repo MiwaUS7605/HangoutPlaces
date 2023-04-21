@@ -3,6 +3,7 @@ package com.groupb.locationsharing.Fragments;
 import static android.app.Activity.RESULT_OK;
 
 import static com.google.firebase.messaging.Constants.TAG;
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -295,9 +296,7 @@ public class ProfileFragment extends Fragment {
                     return;
                 }
                 User user = snapshot.getValue(User.class);
-                if (user.getImageUrl().equals("default")) {
-                    profile_image.setImageResource(R.mipmap.ic_launcher);
-                } else {
+                if (isValidContextForGlide(getContext())) {
                     Glide.with(getContext()).load(user.getImageUrl()).into(profile_image);
                 }
                 username.setText(user.getUsername());

@@ -1,8 +1,9 @@
 package com.groupb.locationsharing;
 
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,9 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -81,7 +80,9 @@ public class CommentActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                if (!isFinishing()) {
+                    finish();
+                }
             }
         });
 
@@ -173,7 +174,9 @@ public class CommentActivity extends AppCompatActivity {
                 if (user.getImageUrl().equals("default")) {
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 } else {
-                    Glide.with(getApplicationContext()).load(user.getImageUrl()).into(profile_image);
+                    if (isValidContextForGlide(getApplicationContext())) {
+                        Glide.with(getApplicationContext()).load(user.getImageUrl()).into(profile_image);
+                    }
                 }
             }
 

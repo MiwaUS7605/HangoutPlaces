@@ -1,6 +1,7 @@
 package com.groupb.locationsharing.Adapter;
 
 import static com.google.firebase.messaging.Constants.TAG;
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -110,9 +111,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                if (user.getImageUrl().equals("default")) {
-                    imageView.setImageResource(R.mipmap.ic_launcher);
-                } else {
+                if (isValidContextForGlide(mContext)) {
                     Glide.with(mContext).load(user.getImageUrl()).into(imageView);
                 }
                 username.setText(user.getUsername());

@@ -1,5 +1,7 @@
 package com.groupb.locationsharing.Adapter;
 
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -81,9 +83,7 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
 
         isFollowing(user.getId(), holder.followBtn);
 
-        if (user.getImageUrl().equals("default")) {
-            holder.profile_image.setImageResource(R.mipmap.ic_launcher);
-        } else {
+        if (isValidContextForGlide(mContext)) {
             Glide.with(mContext).load(user.getImageUrl()).into(holder.profile_image);
         }
 

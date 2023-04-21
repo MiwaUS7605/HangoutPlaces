@@ -1,6 +1,7 @@
 package com.groupb.locationsharing.Adapter;
 
 import static com.google.firebase.messaging.Constants.TAG;
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -94,7 +95,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         Post post = mPost.get(position);
 
-        Glide.with(mContext).load(post.getPostImage()).into(holder.post_image);
+        if (isValidContextForGlide(mContext)) {
+            Glide.with(mContext).load(post.getPostImage()).into(holder.post_image);
+        }
 
         if (post.getPostDescription().equals("")) {
             holder.description.setVisibility(View.GONE);
@@ -252,10 +255,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.commentSymbol.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, CommentActivity.class);
-                intent.putExtra("postId", post.getPostId());
-                intent.putExtra("publisherId", post.getPublisher());
-                mContext.startActivity(intent);
+                if (mContext != null && !((FragmentActivity) mContext).isFinishing()) {
+                    Intent intent = new Intent(mContext, CommentActivity.class);
+                    intent.putExtra("postId", post.getPostId());
+                    intent.putExtra("publisherId", post.getPublisher());
+                    mContext.startActivity(intent);
+                }
             }
         });
 
@@ -589,17 +594,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
         return responseString;
     }
-    private void isSaved(String postId, ImageView imageView){
+
+    private void isSaved(String postId, ImageView imageView) {
         FirebaseUser firebaseUser1 = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Saves")
                 .child(firebaseUser1.getUid());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child(postId).exists()){
+                if (snapshot.child(postId).exists()) {
                     imageView.setImageResource(R.drawable.ico_saved);
                     imageView.setTag("saved");
-                }else{
+                } else {
                     imageView.setImageResource(R.drawable.ico_save);
                     imageView.setTag("save");
                 }

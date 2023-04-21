@@ -1,5 +1,7 @@
 package com.groupb.locationsharing;
 
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,7 +50,8 @@ public class EditProfileActivity extends AppCompatActivity {
     private StorageTask uploadTask;
     StorageReference storageReference;
     private static final int IMAGE_REQUEST = 1;
-    HashMap <String, Object> map;
+    HashMap<String, Object> map;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,9 +77,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 fullname.setText(user.getFullname());
                 username.setText(user.getUsername());
                 bio.setText(user.getBio());
-                if (user.getImageUrl().equals("default")) {
-                    profile_image.setImageResource(R.mipmap.ic_launcher);
-                } else {
+                if (isValidContextForGlide(getApplicationContext())) {
                     Glide.with(getApplicationContext()).load(user.getImageUrl()).into(profile_image);
                 }
                 map = new HashMap<>();
@@ -119,6 +120,7 @@ public class EditProfileActivity extends AppCompatActivity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, IMAGE_REQUEST);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -126,21 +128,21 @@ public class EditProfileActivity extends AppCompatActivity {
         if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             imageUri = data.getData();
-            if(uploadTask!=null&&uploadTask.isInProgress()){
+            if (uploadTask != null && uploadTask.isInProgress()) {
                 Toast.makeText(getApplicationContext(), "Upload in progress", Toast.LENGTH_SHORT).show();
-            }
-            else{
+            } else {
                 uploadImage();
             }
         }
     }
+
     private String getFileExtension(Uri uri) {
         ContentResolver contentResolver = getApplicationContext().getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
-    private void uploadImage(){
+    private void uploadImage() {
         final ProgressDialog pd = new ProgressDialog(this);
         pd.setMessage("Uploading");
         pd.show();
@@ -174,8 +176,9 @@ public class EditProfileActivity extends AppCompatActivity {
                         map.put("imageUrl", imageUri);
 
                         pd.dismiss();
-
-                        Glide.with(getApplicationContext()).load(mUri).into(profile_image);
+                        if (isValidContextForGlide(getApplicationContext())) {
+                            Glide.with(getApplicationContext()).load(mUri).into(profile_image);
+                        }
                     } else {
                         Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
                         pd.dismiss();

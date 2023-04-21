@@ -1,62 +1,35 @@
 package com.groupb.locationsharing;
 
-import static com.google.firebase.messaging.Constants.TAG;
 import static com.groupb.locationsharing.Fragments.MapsFrag.mainLocation;
 import static com.groupb.locationsharing.Fragments.MapsFrag.saveLocationForReload;
 import static com.groupb.locationsharing.Fragments.MapsFrag.saveNameForReload;
 import static com.groupb.locationsharing.Fragments.MapsFrag.saveUsernameForReload;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.groupb.locationsharing.Fragments.ChatsFragment;
 import com.groupb.locationsharing.Fragments.MapsFrag;
 import com.groupb.locationsharing.Fragments.NewsFeedFragment;
 import com.groupb.locationsharing.Fragments.NotificationFragment;
 import com.groupb.locationsharing.Fragments.PostDetailFragment;
 import com.groupb.locationsharing.Fragments.ProfileFragment;
 import com.groupb.locationsharing.Fragments.SearchFragment;
-import com.groupb.locationsharing.Fragments.UsersFragment;
-import com.groupb.locationsharing.Model.User;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseUser firebaseUser;

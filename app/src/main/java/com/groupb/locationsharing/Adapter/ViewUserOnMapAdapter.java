@@ -1,5 +1,6 @@
 package com.groupb.locationsharing.Adapter;
 
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
 import static com.groupb.locationsharing.Fragments.MapsFrag.mainLocation;
 
 import android.app.MediaRouteButton;
@@ -23,17 +24,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.groupb.locationsharing.Fragments.MapsFrag;
 import com.groupb.locationsharing.Fragments.ProfileFragment;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
-
-import java.util.HashMap;
 import java.util.List;
 
 public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdapter.ViewHolder> {
@@ -79,9 +73,7 @@ public class ViewUserOnMapAdapter extends RecyclerView.Adapter<ViewUserOnMapAdap
 
         holder.fullname.setText(user.getFullname() +" - " + distanceToShow + " km");
 
-        if (user.getImageUrl().equals("default")) {
-            holder.profile_image.setImageResource(R.mipmap.ic_launcher);
-        } else {
+        if (isValidContextForGlide(mContext)) {
             Glide.with(mContext).load(user.getImageUrl()).into(holder.profile_image);
         }
 

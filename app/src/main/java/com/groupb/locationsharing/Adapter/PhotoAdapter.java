@@ -1,5 +1,7 @@
 package com.groupb.locationsharing.Adapter;
 
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
@@ -38,7 +40,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Post post = mPosts.get(position);
 
-        Glide.with(mContext).load(post.getPostImage()).into(holder.post_images);
+        if (isValidContextForGlide(mContext)) {
+            Glide.with(mContext).load(post.getPostImage()).into(holder.post_images);
+        }
 
         holder.post_images.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,9 +64,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         return mPosts.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView post_images;
-        public ViewHolder(@NonNull View item){
+
+        public ViewHolder(@NonNull View item) {
             super(item);
             post_images = item.findViewById(R.id.post_image);
         }

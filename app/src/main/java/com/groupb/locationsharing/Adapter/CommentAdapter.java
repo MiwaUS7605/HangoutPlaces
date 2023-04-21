@@ -1,5 +1,6 @@
 package com.groupb.locationsharing.Adapter;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -177,12 +178,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                if (user.getImageUrl().equals("default")) {
-                    imageView.setImageResource(R.mipmap.ic_launcher);
-                } else {
-                    Glide.with(mContext).load(user.getImageUrl()).into(imageView);
+                if (user != null) {
+                    username.setText(user.getUsername());
+                    if (isValidContextForGlide(mContext)){
+                        // Load image via Glide lib using context
+                        Glide.with(mContext).load(user.getImageUrl()).into(imageView);
+                    }
                 }
-                username.setText(user.getUsername());
             }
 
             @Override
@@ -253,5 +255,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             }
         }
         return responseString;
+    }
+    public static boolean isValidContextForGlide(final Context context) {
+        if (context == null) {
+            return false;
+        }
+        if (context instanceof Activity) {
+            final Activity activity = (Activity) context;
+            if (activity.isDestroyed() || activity.isFinishing()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

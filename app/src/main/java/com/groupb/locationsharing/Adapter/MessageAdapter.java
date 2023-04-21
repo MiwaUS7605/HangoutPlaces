@@ -1,5 +1,7 @@
 package com.groupb.locationsharing.Adapter;
 
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
+
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -53,11 +55,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         holder.show_message.setText(chat.getMessage());
 
-        if (image_url.equals("default")) {
-            holder.profile_image.setImageResource(R.mipmap.ic_launcher);
-        } else {
+        if (isValidContextForGlide(mContext)) {
             Glide.with(mContext).load(image_url).into(holder.profile_image);
         }
+
 
         if (position == mChat.size() - 1) {
             if (chat.isIsseen()) {

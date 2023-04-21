@@ -1,6 +1,7 @@
 package com.groupb.locationsharing;
 
 import static com.google.firebase.messaging.Constants.TAG;
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -118,9 +119,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 username.setText(user.getUsername());
-                if (user.getImageUrl().equals("default")) {
-                    profile_image.setImageResource(R.mipmap.ic_launcher);
-                } else {
+                if (isValidContextForGlide(getApplicationContext())) {
                     Glide.with(getApplicationContext()).load(user.getImageUrl()).into(profile_image);
                 }
                 readMessage(firebaseUser.getUid(), userid, user.getImageUrl());

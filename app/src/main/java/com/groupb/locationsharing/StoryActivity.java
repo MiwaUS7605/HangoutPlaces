@@ -1,5 +1,7 @@
 package com.groupb.locationsharing;
 
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -217,9 +219,7 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                if (user.getImageUrl().equals("default")) {
-                    story_photo.setImageResource(R.mipmap.ic_launcher);
-                } else {
+                if (isValidContextForGlide(getApplicationContext())) {
                     Glide.with(getApplicationContext()).load(user.getImageUrl()).into(story_photo);
                 }
                 story_username.setText(user.getUsername());

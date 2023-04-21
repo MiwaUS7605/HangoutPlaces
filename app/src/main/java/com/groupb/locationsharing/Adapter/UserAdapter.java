@@ -1,5 +1,7 @@
 package com.groupb.locationsharing.Adapter;
 
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
+
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -23,10 +25,6 @@ import com.groupb.locationsharing.MessageActivity;
 import com.groupb.locationsharing.Model.Chat;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
-
-import org.w3c.dom.Text;
-
-import java.util.HashMap;
 import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
@@ -59,9 +57,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             holder.last_msg.setVisibility(View.GONE);
         }
 
-        if (user.getImageUrl().equals("default")) {
-            holder.profile_image.setImageResource(R.mipmap.ic_launcher);
-        } else {
+        if (isValidContextForGlide(mContext)) {
             Glide.with(mContext).load(user.getImageUrl()).into(holder.profile_image);
         }
 

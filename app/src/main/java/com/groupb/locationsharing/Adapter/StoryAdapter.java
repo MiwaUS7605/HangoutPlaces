@@ -1,5 +1,7 @@
 package com.groupb.locationsharing.Adapter;
 
+import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,8 +27,6 @@ import com.groupb.locationsharing.Model.Story;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
 import com.groupb.locationsharing.StoryActivity;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -109,13 +109,13 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                if (user.getImageUrl().equals("default")) {
-                    viewHolder.story_photo_seen.setImageResource(R.mipmap.ic_launcher);
-                } else {
+                if (isValidContextForGlide(mContext)) {
                     Glide.with(mContext).load(user.getImageUrl()).into(viewHolder.story_photo);
                 }
                 if (pos != 0) {
-                    Glide.with(mContext).load(user.getImageUrl()).into(viewHolder.story_photo_seen);
+                    if (isValidContextForGlide(mContext)) {
+                        Glide.with(mContext).load(user.getImageUrl()).into(viewHolder.story_photo_seen);
+                    }
                     viewHolder.story_username.setText(user.getUsername());
 
                 }
