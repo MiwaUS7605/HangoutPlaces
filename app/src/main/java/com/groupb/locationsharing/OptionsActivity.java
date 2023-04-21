@@ -51,7 +51,8 @@ public class OptionsActivity extends AppCompatActivity {
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        checkFindable();
+        Thread checkFindableThread = new Thread(() -> checkFindable());
+        checkFindableThread.start();
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override

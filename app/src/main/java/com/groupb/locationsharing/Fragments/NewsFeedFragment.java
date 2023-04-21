@@ -104,6 +104,7 @@ public class NewsFeedFragment extends Fragment {
             }
         }
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -127,8 +128,15 @@ public class NewsFeedFragment extends Fragment {
         storyList = new ArrayList<>();
         storyAdapter = new StoryAdapter(getContext(), storyList);
         recyclerView_story.setAdapter(storyAdapter);
+        progressBar = view.findViewById(R.id.progress_circular);
 
-        checkFollowing();
+        unseen_message = view.findViewById(R.id.number_unseen);
+
+        Thread countUnseenMessageThread = new Thread(() -> countUnseenMessage());
+        Thread checkFollowingThread = new Thread(() -> checkFollowing());
+        countUnseenMessageThread.start();
+        checkFollowingThread.start();
+
         nav_chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,12 +161,6 @@ public class NewsFeedFragment extends Fragment {
                 startActivity(new Intent(getContext(), AddPostActivity.class));
             }
         });
-
-        progressBar = view.findViewById(R.id.progress_circular);
-
-        unseen_message = view.findViewById(R.id.number_unseen);
-
-        countUnseenMessage();
 
         return view;
     }

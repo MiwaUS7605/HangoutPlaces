@@ -46,7 +46,8 @@ public class UsersFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mUsers = new ArrayList<>();
 
-        readUsers();
+        Thread readUsersThread = new Thread(() -> readUsers());
+        readUsersThread.start();
 
         search_users = view.findViewById(R.id.search_users);
         search_users.addTextChangedListener(new TextWatcher() {

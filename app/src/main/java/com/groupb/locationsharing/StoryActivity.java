@@ -89,9 +89,10 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
             r_seen.setVisibility(View.VISIBLE);
             story_delete.setVisibility(View.VISIBLE);
         }
-
-        getStories(userid);
-        userInfor(userid);
+        Thread getStoriesThread = new Thread(() -> getStories(userid));
+        Thread userInfor = new Thread(() -> userInfor(userid));
+        getStoriesThread.start();
+        userInfor.start();
 
         View reverse = findViewById(R.id.reverse);
         reverse.setOnClickListener(new View.OnClickListener() {

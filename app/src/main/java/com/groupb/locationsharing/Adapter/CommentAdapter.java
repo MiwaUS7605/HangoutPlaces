@@ -87,7 +87,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
         holder.comment.setText(comment.getComments());
 
-        getUserInfo(holder.profile_image, holder.username, comment.getPublisher());
+        Thread getUserInfoThread = new Thread(() -> getUserInfo(holder.profile_image, holder.username, comment.getPublisher()));
+        getUserInfoThread.start();
 
         holder.profile_image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,7 +181,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 User user = dataSnapshot.getValue(User.class);
                 if (user != null) {
                     username.setText(user.getUsername());
-                    if (isValidContextForGlide(mContext)){
+                    if (isValidContextForGlide(mContext)) {
                         // Load image via Glide lib using context
                         Glide.with(mContext).load(user.getImageUrl()).into(imageView);
                     }
@@ -256,6 +257,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         }
         return responseString;
     }
+
     public static boolean isValidContextForGlide(final Context context) {
         if (context == null) {
             return false;

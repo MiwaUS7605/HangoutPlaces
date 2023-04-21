@@ -56,7 +56,8 @@ public class SearchFragment extends Fragment {
 
         recyclerView.setAdapter(searchUserAdapter);
 
-        readUsers();
+        Thread readUserThread = new Thread(() -> readUsers());
+        readUserThread.start();
 
         search_bar.addTextChangedListener(new TextWatcher() {
             @Override

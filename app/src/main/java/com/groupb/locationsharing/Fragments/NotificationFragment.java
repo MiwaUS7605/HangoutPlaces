@@ -44,7 +44,8 @@ public class NotificationFragment extends Fragment {
         notificationAdapter = new NotificationAdapter(getContext(), notifications);
         recyclerView.setAdapter(notificationAdapter);
 
-        readNotifications();
+        Thread readNotificationsThread = new Thread(() -> readNotifications());
+        readNotificationsThread.start();
 
         return view;
     }
@@ -59,7 +60,7 @@ public class NotificationFragment extends Fragment {
                 notifications.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Notification notification = snapshot.getValue(Notification.class);
-                    if(notification.getUserId().equals(firebaseUser.getUid())) continue;
+                    if (notification.getUserId().equals(firebaseUser.getUid())) continue;
                     else notifications.add(notification);
                 }
                 Collections.reverse(notifications);

@@ -146,8 +146,10 @@ public class CommentActivity extends AppCompatActivity {
                 }
             }
         });
-        getImage();
-        getComments();
+        Thread getImageThread = new Thread(() -> getImage());
+        Thread getCommentsThread = new Thread(() -> getComments());
+        getImageThread.start();
+        getCommentsThread.start();
     }
 
     @Override

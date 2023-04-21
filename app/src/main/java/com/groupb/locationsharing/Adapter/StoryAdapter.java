@@ -55,18 +55,22 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Story story = mStory.get(position);
-        userInfor(holder, story.getUserId(), position);
+        Thread userInforThread = new Thread(() -> userInfor(holder, story.getUserId(), position));
+        userInforThread.start();
         if (holder.getAdapterPosition() != 0) {
-            seenStory(holder, story.getUserId());
+            Thread seenStoryThread = new Thread(() -> seenStory(holder, story.getUserId()));
+            seenStoryThread.start();
         }
         if (holder.getAdapterPosition() == 0) {
-            myStory(holder.addstoryTxt, holder.story_plus, false);
+            Thread myStoryThread = new Thread(() -> myStory(holder.addstoryTxt, holder.story_plus, false));
+            myStoryThread.start();
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (holder.getAdapterPosition() == 0) {
-                    myStory(holder.addstoryTxt, holder.story_plus, true);
+                    Thread myStoryThread = new Thread(() -> myStory(holder.addstoryTxt, holder.story_plus, true));
+                    myStoryThread.start();
                 } else {
                     Intent intent = new Intent(mContext, StoryActivity.class);
                     intent.putExtra("userId", story.getUserId());

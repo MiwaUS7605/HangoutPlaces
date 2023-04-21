@@ -132,11 +132,17 @@ public class ProfileFragment extends Fragment {
         recyclerView.setVisibility(View.VISIBLE);
         recyclerView_saved.setVisibility(View.GONE);
 
-        getUserInfor();
-        getNumber();
-        myPhotos();
+        Thread getUserInfoThread = new Thread(() -> getUserInfor());
+        Thread getNumberThread = new Thread(() -> getNumber());
+        Thread myPhotosThread = new Thread(() -> myPhotos());
+
+        getUserInfoThread.start();
+        getNumberThread.start();
+        myPhotosThread.start();
+
         if (profileId.equals(firebaseUser.getUid())) {
-            mySavedPhotos();
+            Thread mySavedPhotosThread = new Thread(() -> mySavedPhotos());
+            mySavedPhotosThread.start();
         } else {
             saved_photos.setVisibility(View.GONE);
         }

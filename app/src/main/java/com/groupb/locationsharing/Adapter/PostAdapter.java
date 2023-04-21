@@ -108,11 +108,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         holder.date.setText(post.getTime());
 
-        publisherInfor(holder.profile_image, holder.username, holder.publisher, post.getPublisher());
-        isLiked(post.getPostId(), holder.likeSymbol);
-        isSaved(post.getPostId(), holder.saveSymbol);
-        totalLikes(holder.likes, post.getPostId());
-        totalComments(holder.comments, post.getPostId());
+        Thread publisherInforThread = new Thread(() -> publisherInfor(holder.profile_image, holder.username, holder.publisher, post.getPublisher()));
+        Thread isLikedThread = new Thread(() -> isLiked(post.getPostId(), holder.likeSymbol));
+        Thread isSavedThread = new Thread(() -> isSaved(post.getPostId(), holder.saveSymbol));
+        Thread totalLikesThread = new Thread(() -> totalLikes(holder.likes, post.getPostId()));
+        Thread totalCommentsThread = new Thread(() -> totalComments(holder.comments, post.getPostId()));
+
+        publisherInforThread.start();
+        isLikedThread.start();
+        isSavedThread.start();
+        totalLikesThread.start();
+        totalCommentsThread.start();
 
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {

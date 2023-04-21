@@ -122,7 +122,8 @@ public class MessageActivity extends AppCompatActivity {
                 if (isValidContextForGlide(getApplicationContext())) {
                     Glide.with(getApplicationContext()).load(user.getImageUrl()).into(profile_image);
                 }
-                readMessage(firebaseUser.getUid(), userid, user.getImageUrl());
+                Thread readMessageThread = new Thread(() -> readMessage(firebaseUser.getUid(), userid, user.getImageUrl()));
+                readMessageThread.start();
             }
 
             @Override
@@ -130,8 +131,8 @@ public class MessageActivity extends AppCompatActivity {
 
             }
         });
-
-        seenMessage(userid);
+        Thread seenMessageThread = new Thread(() -> seenMessage(userid));
+        seenMessageThread.start();
     }
 
     private void seenMessage(String userid) {

@@ -70,16 +70,20 @@ public class FollowersActivity extends AppCompatActivity {
 
         switch (title) {
             case "likes":
-                getLikes();
+                Thread getLikesThread = new Thread(() -> getLikes());
+                getLikesThread.start();
                 break;
             case "following":
-                getFollowing();
+                Thread getFollowingThread = new Thread(() -> getFollowing());
+                getFollowingThread.start();
                 break;
             case "followers":
-                getFollowers();
+                Thread getFollowersThread = new Thread(() -> getFollowers());
+                getFollowersThread.start();
                 break;
             case "views":
-                getViews();
+                Thread getViewsThread = new Thread(() -> getViews());
+                getViewsThread.start();
                 break;
         }
     }
@@ -94,7 +98,8 @@ public class FollowersActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     listId.add(snapshot.getKey());
                 }
-                showUsers();
+                Thread showUsersThread = new Thread(() -> showUsers());
+                showUsersThread.start();
             }
 
             @Override
@@ -114,7 +119,8 @@ public class FollowersActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     listId.add(snapshot.getKey());
                 }
-                showUsers();
+                Thread showUsersThread = new Thread(() -> showUsers());
+                showUsersThread.start();
             }
 
             @Override
@@ -134,7 +140,8 @@ public class FollowersActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     listId.add(snapshot.getKey());
                 }
-                showUsers();
+                Thread showUsersThread = new Thread(() -> showUsers());
+                showUsersThread.start();
             }
 
             @Override
@@ -154,7 +161,8 @@ public class FollowersActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     listId.add(snapshot.getKey());
                 }
-                showUsers();
+                Thread showUsersThread = new Thread(() -> showUsers());
+                showUsersThread.start();
             }
 
             @Override

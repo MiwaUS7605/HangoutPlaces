@@ -25,6 +25,7 @@ import com.groupb.locationsharing.MessageActivity;
 import com.groupb.locationsharing.Model.Chat;
 import com.groupb.locationsharing.Model.User;
 import com.groupb.locationsharing.R;
+
 import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
@@ -52,7 +53,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         holder.username.setText(user.getUsername());
 
         if (isChat) {
-            lastMsg(user.getId(), holder.last_msg);
+            Thread lastMsgThread = new Thread(() -> lastMsg(user.getId(), holder.last_msg));
+            lastMsgThread.start();
         } else {
             holder.last_msg.setVisibility(View.GONE);
         }

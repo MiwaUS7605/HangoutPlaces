@@ -39,6 +39,7 @@ public class PostDetailFragment extends Fragment {
     private PostAdapter postAdapter;
     private List<Post> postList;
     private ImageView back;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -57,7 +58,8 @@ public class PostDetailFragment extends Fragment {
 
         back = view.findViewById(R.id.icon);
 
-        readPosts();
+        Thread readPostsThread = new Thread(() -> readPosts());
+        readPostsThread.start();
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
