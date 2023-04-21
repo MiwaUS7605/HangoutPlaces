@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools” android:id=“@+id/myScreen1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -41,57 +41,80 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/spinner_bar"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_weight="4"
-        android:background="@drawable/custom_edittext"
-        android:paddingLeft="10dp"
-        android:paddingTop="10dp">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bar"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/fromText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Type your message"
-            android:maxLines="2"
-            android:textColor="@color/white"
-            android:textColorHint="#878383" />
-    </ScrollView>
-
-    <ImageView
-        android:id="@+id/transButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:layout_weight="1"
-        android:background="@drawable/background_button"
-        android:src="@drawable/ic_translate"></ImageView>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_weight="10"
-        android:background="@drawable/custom_edittext"
-        android:paddingLeft="10dp"
-        android:paddingTop="10dp">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:background="@drawable/custom_edittext"
+            android:padding="5dp">
 
             <TextView
-                android:id="@+id/toText"
+                android:id="@+id/languageFrom"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:text="Auto detect"
+                android:textColor="@color/white"></TextView>
+
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="20dp"
-                android:maxLines="2"
-                android:textColor="@color/white"
-                android:textSize="20dp"
-                android:textStyle="bold" />
-        </RelativeLayout>
-    </ScrollView>
-</LinearLayout>
+                android:background="@drawable/ico_arrow_forward">
+
+            </ImageView>
+
+            <TextView
+                android:id="@+id/languageTo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:textColor="@color/white"></TextView>
+
+            <Spinner
+                android:id="@+id/languageToSpinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/ico_dropdown"></Spinner>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/fromText"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@+id/spinner_bar"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:gravity="top"
+        android:hint="Enter text"
+        android:maxLines="5"
+        android:singleLine="false"
+        android:textColor="@color/white"
+        android:textColorHint="#878383" />
+
+    <TextView
+        android:id="@+id/toText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fromText"
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="10dp"
+        android:maxLines="2"
+        android:textColor="@color/white"
+        android:textSize="20dp" />
+
+</RelativeLayout>
