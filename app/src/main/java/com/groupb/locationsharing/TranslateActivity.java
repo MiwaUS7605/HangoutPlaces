@@ -1,11 +1,20 @@
 package com.groupb.locationsharing;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.util.Pair;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,20 +27,31 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import com.detectlanguage.DetectLanguage;
+import com.detectlanguage.Result;
+import com.detectlanguage.errors.APIError;
+import com.google.firebase.database.tubesock.WebSocket;
 
 
 public class TranslateActivity extends AppCompatActivity {
     ImageView translateButton, icon;
-    TextView toText;
+    TextView toText, languageFrom, languageTo;
     EditText fromText;
     String translated;
+    Spinner spinnerTo;
+    private Handler handler = new Handler();
+    private Runnable translationRunnable;
+
+    String apiKey = "25158ff602380332d1d456163bf31e52";
 
     public static boolean isVietnamese(String input) {
         // Danh sách các ký tự tiếng Việt trong bảng mã Unicode
-        final String vietnameseCharacters = "ĂẮẰẤẾẶẲẨÊẾỀỂỆƠÓỐỒỐỚỢỞỜỤỨỪỰỬÍỐỚỜỢỞÚỨỪỰỬÝĐ";
-        String upperCase = input.toUpperCase(Locale.ROOT);
+        final String vietnameseCharacters = "àằèềìòồùừáắéếíóốúứýãẵẽễĩõỗũữỹảẳẻểỉỏổủửỷạặẹệịọộụựỵăĕĭŏŭơưôêđ";
+        String upperCase = input.toLowerCase(Locale.ROOT);
         for (char c : upperCase.toCharArray()) {
             // Kiểm tra xem ký tự c có nằm trong danh sách ký tự tiếng Việt không
             if (vietnameseCharacters.contains(Character.toString(c))) {
@@ -91,32 +111,164 @@ public class TranslateActivity extends AppCompatActivity {
         return responseString;
     }
 
+    class LanguageItem {
+        ArrayList<String> language;
+        ArrayList<String> isoCode;
+
+        LanguageItem() {
+            language = new ArrayList<>();
+            isoCode = new ArrayList<>();
+            Locale[] locales = Locale.getAvailableLocales();
+            for (Locale locale : locales) {
+                String[] iso2 = locale.getISOLanguages();
+                String code = locale.getISO3Language();
+                String name = locale.getDisplayLanguage();
+                if (!"".equals(code) && !"".equals(name)) {
+                    if (name.equals("world")) continue;
+                    if (language.contains(name)) continue;
+                    language.add(name);
+                    isoCode.add(code.substring(0, 2).toLowerCase());
+                }
+            }
+        }
+
+        public ArrayList<String> getLanguage() {
+            return language;
+        }
+
+        public void setLanguage(ArrayList<String> language) {
+            this.language = language;
+        }
+
+        public ArrayList<String> getIsoCode() {
+            return isoCode;
+        }
+
+        public void setIsoCode(ArrayList<String> isoCode) {
+            this.isoCode = isoCode;
+        }
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ggtranslate);
-        translateButton = findViewById(R.id.transButton);
         fromText = findViewById(R.id.fromText);
         toText = findViewById(R.id.toText);
         icon = findViewById(R.id.icon);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        translateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String input = fromText.getText().toString();
-                try {
-                    if (isVietnamese(input)) {
-                        translated = translate("vi", "en", input);
-                    } else {
-                        translated = translate("en", "vi", input);
+
+        DetectLanguage.apiKey = apiKey;
+
+        final String[] from = {""};
+        final String[] to = {""};
+
+        LanguageItem languageItem = new LanguageItem();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, languageItem.getLanguage());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinnerTo = findViewById(R.id.languageToSpinner);
+        spinnerTo.setAdapter(adapter);
+
+        languageFrom = findViewById(R.id.languageFrom);
+        languageTo = findViewById(R.id.languageTo);
+
+        fromText.addTextChangedListener(new TextWatcher() {
+            private Handler handler = new Handler();
+            private Runnable detectLanguageRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    List<Result> results = null;
+                    try {
+                        results = DetectLanguage.detect(fromText.getText().toString());
+                    } catch (APIError e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    
+                    if (results != null && !results.isEmpty()) {
+                        Result result = results.get(0);
+                        from[0] = result.language;
+                        String language = languageItem.getLanguage().get(languageItem.getIsoCode().indexOf(from[0]));
+                        languageFrom.setText("Auto Detect: " + language);
+                        Log.e(TAG, from[0]);
+                    } else {
+                        Log.e(TAG, "No language detected");
+                    }
                 }
-                toText.setText(translated);
+            };
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                handler.removeCallbacks(detectLanguageRunnable);
+
+                handler.postDelayed(detectLanguageRunnable, 500);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
+
+        spinnerTo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedLanguage = parent.getItemAtPosition(position).toString();
+                spinnerTo.setSelection(position); // Update Spinner selection
+                languageTo.setText(selectedLanguage);
+                to[0] = languageItem.getIsoCode().get(position);
+                Log.e(TAG, to[0]);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle case when no item is selected
+            }
+        });
+
+        fromText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                handler.removeCallbacks(translationRunnable);
+
+                // Define a new translation runnable
+                translationRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        String input = fromText.getText().toString();
+                        try {
+                            translated = translate(from[0], to[0], input);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        toText.setText(translated);
+                    }
+                };
+
+                // Post the translation runnable with a delay of 300 milliseconds
+                handler.postDelayed(translationRunnable, 1000);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
