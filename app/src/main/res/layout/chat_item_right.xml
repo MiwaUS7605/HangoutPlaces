@@ -11,7 +11,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/ic_launcher"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/show_message"
@@ -21,16 +21,25 @@
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/profile_image"
         android:background="@drawable/background_right"
-        android:padding="8dp"
-        android:text="hello this is a message"/>
+        android:padding="8dp" />
+
+    <ImageView
+        android:id="@+id/show_image"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/profile_image"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY" />
 
     <TextView
         android:id="@+id/txt_seen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/show_message"
-        android:textColor="@color/white"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentRight="true"
+        android:textColor="@color/white" />
 
 </RelativeLayout>
