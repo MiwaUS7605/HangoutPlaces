@@ -77,7 +77,7 @@ public class AddPostActivity extends AppCompatActivity {
         });
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
+        intent.setType("image/* video/*");
 
         startActivityForResult(intent, CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE);
 

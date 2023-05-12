@@ -53,7 +53,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         holder.username.setText(user.getUsername());
 
         if (isChat) {
-            Thread lastMsgThread = new Thread(() -> lastMsg(user.getId(), holder.last_msg));
+            Thread lastMsgThread = new Thread(() -> lastMsg(user.getId(), holder.last_msg, user.getUsername()));
             lastMsgThread.start();
         } else {
             holder.last_msg.setVisibility(View.GONE);
@@ -109,7 +109,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         }
     }
 
-    private void lastMsg(String userid, TextView last_msg) {
+    private void lastMsg(String userid, TextView last_msg, String username) {
         theLastMessage = "default";
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Chats");
@@ -122,8 +122,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                     if (chat.getReceiver().equals(firebaseUser.getUid())
                             && chat.getSender().equals(userid) || chat.getReceiver().equals(userid)
                             && chat.getSender().equals(firebaseUser.getUid())) {
-
-                        theLastMessage = chat.getMessage();
+                        if (chat.isIsImage() == false) {
+                            theLastMessage = chat.getMessage();
+                        } else {
+                            theLastMessage = username + " sent an image";
+                        }
                     }
 
                     switch (theLastMessage) {

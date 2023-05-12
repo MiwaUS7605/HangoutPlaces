@@ -1,14 +1,16 @@
 package com.groupb.locationsharing.Adapter;
 
+import static android.service.controls.ControlsProviderService.TAG;
 import static com.groupb.locationsharing.Adapter.CommentAdapter.isValidContextForGlide;
 
 import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,7 +55,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public void onBindViewHolder(@NonNull MessageAdapter.ViewHolder holder, int position) {
         Chat chat = mChat.get(position);
 
-        holder.show_message.setText(chat.getMessage());
+        //Toast.makeText(mContext, position + ": " + chat.isImage(), Toast.LENGTH_SHORT).show();
+
+        if (!chat.isIsImage()) {
+            holder.show_message.setText(chat.getMessage());
+            holder.show_image.setVisibility(View.GONE);
+        } else if (chat.isIsImage()) {
+            if (isValidContextForGlide(mContext)) {
+                Glide.with(mContext).load(chat.getMessage()).into(holder.show_image);
+            }
+            holder.show_message.setVisibility(View.GONE);
+        }
 
         if (isValidContextForGlide(mContext)) {
             Glide.with(mContext).load(image_url).into(holder.profile_image);
@@ -76,16 +88,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView show_message;
-        public ImageView profile_image;
-        public TextView txt_seen;
+        public TextView show_message, txt_seen;
+        public ImageView profile_image, show_image;
 
         public ViewHolder(View itemView) {
             super(itemView);
             show_message = itemView.findViewById(R.id.show_message);
             profile_image = itemView.findViewById(R.id.profile_image);
             txt_seen = itemView.findViewById(R.id.txt_seen);
-
+            show_image = itemView.findViewById(R.id.show_image);
         }
     }
 
