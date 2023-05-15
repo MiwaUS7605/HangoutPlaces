@@ -57,15 +57,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         //Toast.makeText(mContext, position + ": " + chat.isImage(), Toast.LENGTH_SHORT).show();
 
-        if (!chat.isIsImage()) {
-            holder.show_message.setText(chat.getMessage());
-            holder.show_image.setVisibility(View.GONE);
-        } else if (chat.isIsImage()) {
-            if (isValidContextForGlide(mContext)) {
-                Glide.with(mContext).load(chat.getMessage()).into(holder.show_image);
-            }
-            holder.show_message.setVisibility(View.GONE);
+//        if (!chat.isIsImage()) {
+//            holder.show_message.setText(chat.getMessage());
+//            holder.show_image.setVisibility(View.GONE);
+//        } else if (chat.isIsImage()) {
+//            if (isValidContextForGlide(mContext)) {
+//                Glide.with(mContext).load(chat.getMessage()).into(holder.show_image);
+//            }
+//            holder.show_message.setVisibility(View.GONE);
+//        }
+
+        if (chat.isIsImage()){
+            Glide.with(mContext).load(chat.getMessage()).into(holder.show_image);
         }
+        else holder.show_message.setText(chat.getMessage());
 
         if (isValidContextForGlide(mContext)) {
             Glide.with(mContext).load(image_url).into(holder.profile_image);

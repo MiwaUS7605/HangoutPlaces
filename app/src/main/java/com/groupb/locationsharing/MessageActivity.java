@@ -62,7 +62,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MessageActivity extends AppCompatActivity {
-    ImageView imageSend, cameraSend;
+    ImageView imageSend;
     CircleImageView profile_image;
     TextView username;
     ImageButton sendBtn;
@@ -114,7 +114,6 @@ public class MessageActivity extends AppCompatActivity {
         sendBtn = findViewById(R.id.btnSend);
         textSend = findViewById(R.id.textSend);
         imageSend = findViewById(R.id.imageSend);
-        cameraSend = findViewById(R.id.cameraSend);
 
         intent = getIntent();
         userid = intent.getStringExtra("userid");
@@ -138,13 +137,6 @@ public class MessageActivity extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, PICK_IMAGE);
-            }
-        });
-
-        cameraSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
             }
         });
 
